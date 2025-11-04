@@ -1,0 +1,72 @@
+################################################################################
+# TDD Green Phase - テスト結果（成功フェーズ）
+################################################################################
+#
+# 目的: 実装を完了し、全てのテストが通ることを確認する
+# 状態: ✅ PASSED - 全テスト成功
+# 実行日時: data_loader.py実装後
+# コマンド: pytest tests/test_data_loader.py -v --cov=src --cov-report=html
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 7 items
+
+tests/test_data_loader.py::TestGetData::test_get_data_returns_four_arrays PASSED [ 14%]
+tests/test_data_loader.py::TestGetData::test_train_test_split_ratio PASSED [ 28%]
+tests/test_data_loader.py::TestGetData::test_data_shapes PASSED          [ 42%]
+tests/test_data_loader.py::TestGetData::test_data_types PASSED           [ 57%]
+tests/test_data_loader.py::TestGetData::test_reproducibility PASSED      [ 71%]
+tests/test_data_loader.py::TestGetData::test_different_test_size PASSED  [ 85%]
+tests/test_data_loader.py::TestGetData::test_class_labels PASSED         [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+src/iris_sklearn_svc/__init__.py          0      0   100%
+src/iris_sklearn_svc/data_loader.py      14      0   100%
+-------------------------------------------------------------------
+TOTAL                                    14      0   100%
+
+Coverage HTML written to dir htmlcov
+
+============================== 7 passed in 4.46s ===============================
+
+################################################################################
+# Green Phase 分析
+################################################################################
+#
+# テスト結果サマリー:
+#   ✅ 全7テストケースが成功（PASSED）
+#   ✅ コードカバレッジ: 100%（14ステートメント中14ステートメント実行）
+#   ✅ 実行時間: 4.46秒
+#
+# 成功したテストケース:
+#   1. test_get_data_returns_four_arrays    - 4つのndarrayが返されることを確認
+#   2. test_train_test_split_ratio          - train/testの分割比率が正しいことを確認
+#   3. test_data_shapes                     - データの形状が正しいことを確認
+#   4. test_data_types                      - データ型がfloat32であることを確認
+#   5. test_reproducibility                 - 同じseedで再現性があることを確認
+#   6. test_different_test_size             - 異なるtest_sizeが適用されることを確認
+#   7. test_class_labels                    - クラスラベルが0,1,2であることを確認
+#
+# カバレッジ詳細:
+#   - src/iris_sklearn_svc/__init__.py: 0文（空ファイル）
+#   - src/iris_sklearn_svc/data_loader.py: 14文（100%カバー）
+#
+# HTMLレポート:
+#   - htmlcov/index.html で詳細なカバレッジを確認可能
+#   - 各行の実行回数や未カバーの分岐を可視化
+#
+# TDDサイクル完了:
+#   Red（失敗）→ Green（成功）→ 次はRefactor（リファクタリング）
+#
+################################################################################

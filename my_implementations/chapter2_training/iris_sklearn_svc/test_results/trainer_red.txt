@@ -1,0 +1,62 @@
+################################################################################
+# TDD Red Phase - trainer.py テスト結果（失敗フェーズ）
+################################################################################
+#
+# 目的: モデル学習機能のテストを先に書き、実装がない状態で失敗することを確認する
+# 状態: ❌ FAILED - 期待通りの失敗
+# 実行日時: trainer.py実装前
+# テスト数: 8テストケース
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+____________________ ERROR collecting tests/test_trainer.py ____________________
+
+ImportError while importing test module:
+  tests/test_trainer.py:8: in <module>
+    from iris_sklearn_svc.trainer import train_model
+E   ModuleNotFoundError: No module named 'iris_sklearn_svc.trainer'
+
+=========================== short test summary info ============================
+ERROR tests/test_trainer.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 1.91s ===============================
+
+################################################################################
+# Red Phase 分析
+################################################################################
+#
+# エラー内容:
+#   - ModuleNotFoundError: モジュール 'iris_sklearn_svc.trainer' が見つからない
+#   - train_model 関数がインポートできない
+#
+# テスト対象:
+#   1. test_train_model_returns_pipeline - 学習後にPipelineが返されるか
+#   2. test_trained_model_is_fitted - モデルがfitされているか
+#   3. test_trained_model_can_predict_probabilities - 確率予測が可能か
+#   4. test_predictions_are_valid_classes - 予測が有効なクラスラベルか
+#   5. test_model_achieves_reasonable_accuracy - 合理的な精度を達成するか
+#   6. test_scaler_is_fitted - StandardScalerがfitされているか
+#   7. test_svc_is_fitted - SVCがfitされているか
+#   8. test_reproducibility - 再現性があるか
+#
+# これは正しいTDDの流れ:
+#   1. テストを先に書く（8つのテストケース）
+#   2. 実装がないのでテストが失敗する（Red）
+#   3. これから実装を書いてテストを通す（Green）
+#
+# 次のステップ:
+#   - src/iris_sklearn_svc/trainer.py を実装する
+#   - train_model(pipeline, x_train, y_train) 関数を作成する
+#   - pipelineをfitして学習済みpipelineを返す
+#
+################################################################################

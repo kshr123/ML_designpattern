@@ -172,6 +172,13 @@ pytest --lf
 # 最初の失敗で止める
 pytest -x
 
+# HTMLカバレッジレポート生成
+pytest --cov=src --cov-report=html
+
+# テスト結果をファイルに保存（TDD用）
+pytest -v > test_results_red.txt 2>&1    # Red: 失敗時
+pytest -v --cov=src --cov-report=html > test_results_green.txt 2>&1  # Green: 成功時
+
 # 標準出力を表示
 pytest -s
 ```

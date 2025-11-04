@@ -98,5 +98,9 @@ RESTART_*.md
 htmlcov/
 .tox/
 
+# テスト結果ファイルは保存する（除外しない）
+# test_results_red.txt
+# test_results_green.txt
+
 # OS
 Thumbs.db

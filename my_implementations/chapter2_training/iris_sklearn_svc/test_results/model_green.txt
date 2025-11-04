@@ -1,0 +1,75 @@
+################################################################################
+# TDD Green Phase - model.py テスト結果（成功フェーズ）
+################################################################################
+#
+# 目的: パイプライン構築機能の実装を完了し、全てのテストが通ることを確認する
+# 状態: ✅ PASSED - 全テスト成功
+# 実行日時: model.py実装後
+# コマンド: pytest tests/test_model.py -v --cov=src/iris_sklearn_svc/model.py
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 8 items
+
+tests/test_model.py::TestBuildPipeline::test_build_pipeline_returns_pipeline PASSED [ 12%]
+tests/test_model.py::TestBuildPipeline::test_pipeline_has_two_steps PASSED [ 25%]
+tests/test_model.py::TestBuildPipeline::test_first_step_is_scaler PASSED [ 37%]
+tests/test_model.py::TestBuildPipeline::test_second_step_is_svc PASSED   [ 50%]
+tests/test_model.py::TestBuildPipeline::test_svc_has_probability_enabled PASSED [ 62%]
+tests/test_model.py::TestBuildPipeline::test_svc_has_rbf_kernel PASSED   [ 75%]
+tests/test_model.py::TestBuildPipeline::test_pipeline_has_random_state PASSED [ 87%]
+tests/test_model.py::TestBuildPipeline::test_pipeline_reproducibility PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+src/iris_sklearn_svc/__init__.py          0      0   100%
+src/iris_sklearn_svc/model.py             6      0   100%
+-------------------------------------------------------------------
+TOTAL                                     6      0   100%
+
+============================== 8 passed in 1.55s ===============================
+
+################################################################################
+# Green Phase 分析
+################################################################################
+#
+# テスト結果サマリー:
+#   ✅ 全8テストケースが成功（PASSED）
+#   ✅ コードカバレッジ: 100%（model.py の6ステートメント全て実行）
+#   ✅ 実行時間: 1.55秒
+#
+# 成功したテストケース:
+#   1. test_build_pipeline_returns_pipeline    - Pipelineオブジェクトが返される ✓
+#   2. test_pipeline_has_two_steps             - 2ステップ構成（scaler + svc） ✓
+#   3. test_first_step_is_scaler               - 1番目がStandardScaler ✓
+#   4. test_second_step_is_svc                 - 2番目がSVC ✓
+#   5. test_svc_has_probability_enabled        - probability=True ✓
+#   6. test_svc_has_rbf_kernel                 - kernel='rbf' ✓
+#   7. test_pipeline_has_random_state          - random_state設定あり ✓
+#   8. test_pipeline_reproducibility           - 再現性が確保されている ✓
+#
+# カバレッジ詳細:
+#   - src/iris_sklearn_svc/model.py: 6文（100%カバー）
+#     - build_pipeline() 関数の全ロジックが実行された
+#     - Pipeline構築、StandardScaler、SVC設定が全てテスト済み
+#
+# 実装内容:
+#   - scikit-learn Pipelineを使用した2段階モデル
+#   - StandardScaler: 特徴量の標準化（平均0、標準偏差1）
+#   - SVC: RBFカーネル、probability=True（確率出力）、random_state=42（再現性）
+#
+# TDDサイクル完了:
+#   Red（失敗）→ Green（成功）✓
+#   次のステップ: trainer.py の実装へ
+#
+################################################################################

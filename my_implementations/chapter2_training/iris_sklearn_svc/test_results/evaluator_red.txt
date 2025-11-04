@@ -1,0 +1,65 @@
+################################################################################
+# TDD Red Phase - evaluator.py テスト結果（失敗フェーズ）
+################################################################################
+#
+# 目的: モデル評価機能のテストを先に書き、実装がない状態で失敗することを確認する
+# 状態: ❌ FAILED - 期待通りの失敗
+# 実行日時: evaluator.py実装前
+# テスト数: 10テストケース
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_evaluator.py ___________________
+
+ImportError while importing test module:
+  tests/test_evaluator.py:6: in <module>
+    from iris_sklearn_svc.evaluator import evaluate_model
+E   ModuleNotFoundError: No module named 'iris_sklearn_svc.evaluator'
+
+=========================== short test summary info ============================
+ERROR tests/test_evaluator.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.18s ===============================
+
+################################################################################
+# Red Phase 分析
+################################################################################
+#
+# エラー内容:
+#   - ModuleNotFoundError: モジュール 'iris_sklearn_svc.evaluator' が見つからない
+#   - evaluate_model 関数がインポートできない
+#
+# テスト対象:
+#   1. test_evaluate_model_returns_dict - 評価結果が辞書で返されるか
+#   2. test_metrics_contains_required_keys - accuracy, precision, recallが含まれるか
+#   3. test_accuracy_is_float - accuracyがfloat型か
+#   4. test_precision_is_float - precisionがfloat型か
+#   5. test_recall_is_float - recallがfloat型か
+#   6. test_metrics_are_in_valid_range - 指標が0-1の範囲内か
+#   7. test_model_achieves_good_accuracy - 90%以上の精度を達成するか
+#   8. test_precision_and_recall_are_reasonable - precision/recallが85%以上か
+#   9. test_reproducibility - 同じ入力で同じ結果が得られるか
+#   10. test_metrics_consistency - 指標の一貫性（F1スコア計算で検証）
+#
+# これは正しいTDDの流れ:
+#   1. テストを先に書く（10個のテストケース）
+#   2. 実装がないのでテストが失敗する（Red）
+#   3. これから実装を書いてテストを通す（Green）
+#
+# 次のステップ:
+#   - src/iris_sklearn_svc/evaluator.py を実装する
+#   - evaluate_model(trained_model, x_test, y_test) 関数を作成する
+#   - accuracy, precision, recall を計算して辞書で返す
+#   - scikit-learnのaccuracy_score, precision_score, recall_scoreを使用
+#
+################################################################################

@@ -1,0 +1,62 @@
+################################################################################
+# TDD Red Phase - model.py テスト結果（失敗フェーズ）
+################################################################################
+#
+# 目的: パイプライン構築機能のテストを先に書き、実装がない状態で失敗することを確認する
+# 状態: ❌ FAILED - 期待通りの失敗
+# 実行日時: model.py実装前
+# テスト数: 8テストケース
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+_____________________ ERROR collecting tests/test_model.py _____________________
+
+ImportError while importing test module:
+  tests/test_model.py:9: in <module>
+    from iris_sklearn_svc.model import build_pipeline
+E   ModuleNotFoundError: No module named 'iris_sklearn_svc.model'
+
+=========================== short test summary info ============================
+ERROR tests/test_model.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 2.41s ===============================
+
+################################################################################
+# Red Phase 分析
+################################################################################
+#
+# エラー内容:
+#   - ModuleNotFoundError: モジュール 'iris_sklearn_svc.model' が見つからない
+#   - build_pipeline 関数がインポートできない
+#
+# テスト対象:
+#   1. test_build_pipeline_returns_pipeline - Pipelineオブジェクトが返されるか
+#   2. test_pipeline_has_two_steps - 2ステップ（scaler + svc）を持つか
+#   3. test_first_step_is_scaler - 最初のステップがStandardScalerか
+#   4. test_second_step_is_svc - 2番目のステップがSVCか
+#   5. test_svc_has_probability_enabled - SVCのprobability=Trueか
+#   6. test_svc_has_rbf_kernel - RBFカーネルを使用しているか
+#   7. test_pipeline_has_random_state - random_stateが設定されているか
+#   8. test_pipeline_reproducibility - 同じパイプラインを再生成できるか
+#
+# これは正しいTDDの流れ:
+#   1. テストを先に書く（8つのテストケース）
+#   2. 実装がないのでテストが失敗する（Red）
+#   3. これから実装を書いてテストを通す（Green）
+#
+# 次のステップ:
+#   - src/iris_sklearn_svc/model.py を実装する
+#   - build_pipeline() 関数を作成する
+#   - StandardScaler + SVC(probability=True) のパイプラインを返す
+#
+################################################################################

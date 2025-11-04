@@ -1,0 +1,48 @@
+################################################################################
+# TDD Red Phase - テスト結果（失敗フェーズ）
+################################################################################
+#
+# 目的: テストを先に書き、実装がない状態で失敗することを確認する
+# 状態: ❌ FAILED - 期待通りの失敗
+# 実行日時: data_loader.py実装前
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.1, pytest-8.3.4, pluggy-1.5.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+plugins: cov-6.0.0
+
+collecting ...
+
+==================================== ERRORS ====================================
+_____________________ ERROR collecting tests/test_data_loader.py _____________________
+
+ImportError while importing test module:
+  tests/test_data_loader.py:7: in <module>
+    from iris_sklearn_svc.data_loader import get_data
+E   ModuleNotFoundError: No module named 'iris_sklearn_svc'
+
+=========================== short test summary info ============================
+ERROR tests/test_data_loader.py - ModuleNotFoundError: No module named 'iris_sklearn_svc'
+
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.03s ===============================
+
+################################################################################
+# Red Phase 分析
+################################################################################
+#
+# エラー内容:
+#   - ModuleNotFoundError: モジュール 'iris_sklearn_svc' が見つからない
+#   - テストファイルはインポートすらできない状態
+#
+# これは正しいTDDの流れ:
+#   1. テストを先に書く
+#   2. 実装がないのでテストが失敗する（Red）
+#   3. これから実装を書いてテストを通す（Green）
+#
+# 次のステップ: src/iris_sklearn_svc/data_loader.py を実装する
+#
+################################################################################

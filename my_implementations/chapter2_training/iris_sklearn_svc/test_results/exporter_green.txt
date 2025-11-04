@@ -1,0 +1,95 @@
+################################################################################
+# TDD Green Phase - exporter.py テスト結果（成功フェーズ）
+################################################################################
+#
+# 目的: ONNX変換機能の実装を完了し、全てのテストが通ることを確認する
+# 状態: ✅ PASSED - 全テスト成功
+# 実行日時: exporter.py実装後
+# コマンド: pytest tests/test_exporter.py -v --cov=src/iris_sklearn_svc/exporter.py
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 9 items
+
+tests/test_exporter.py::TestExportToOnnx::test_export_creates_file PASSED [ 11%]
+tests/test_exporter.py::TestExportToOnnx::test_exported_file_is_valid_onnx PASSED [ 22%]
+tests/test_exporter.py::TestExportToOnnx::test_onnx_model_passes_checker PASSED [ 33%]
+tests/test_exporter.py::TestExportToOnnx::test_onnx_model_has_correct_input_shape PASSED [ 44%]
+tests/test_exporter.py::TestExportToOnnx::test_onnx_model_has_output PASSED [ 55%]
+tests/test_exporter.py::TestExportToOnnx::test_export_with_different_path PASSED [ 66%]
+tests/test_exporter.py::TestExportToOnnx::test_export_overwrites_existing_file PASSED [ 77%]
+tests/test_exporter.py::TestExportToOnnx::test_exported_model_metadata PASSED [ 88%]
+tests/test_exporter.py::TestExportToOnnx::test_file_size_is_reasonable PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+src/iris_sklearn_svc/__init__.py          0      0   100%
+src/iris_sklearn_svc/data_loader.py      14      0   100%
+src/iris_sklearn_svc/exporter.py          8      0   100%
+src/iris_sklearn_svc/model.py             6      0   100%
+src/iris_sklearn_svc/trainer.py           5      0   100%
+-------------------------------------------------------------------
+TOTAL                                    33      0   100%
+
+============================== 9 passed in 6.67s ===============================
+
+################################################################################
+# Green Phase 分析
+################################################################################
+#
+# テスト結果サマリー:
+#   ✅ 全9テストケースが成功（PASSED）
+#   ✅ コードカバレッジ: 100%（exporter.py の8ステートメント全て実行）
+#   ✅ 実行時間: 6.67秒（ONNX変換処理のため少し時間がかかる）
+#
+# 成功したテストケース:
+#   1. test_export_creates_file               - ONNXファイルが作成される ✓
+#   2. test_exported_file_is_valid_onnx       - 有効なONNXモデル ✓
+#   3. test_onnx_model_passes_checker         - ONNXチェッカー通過 ✓
+#   4. test_onnx_model_has_correct_input_shape - 入力形状が正しい（4次元） ✓
+#   5. test_onnx_model_has_output             - 出力ノードが存在 ✓
+#   6. test_export_with_different_path        - 異なるパスでエクスポート可能 ✓
+#   7. test_export_overwrites_existing_file   - 既存ファイルを上書き可能 ✓
+#   8. test_exported_model_metadata           - メタデータ含まれる ✓
+#   9. test_file_size_is_reasonable           - ファイルサイズ妥当（1KB-10MB） ✓
+#
+# カバレッジ詳細:
+#   - src/iris_sklearn_svc/exporter.py: 8文（100%カバー）
+#     - export_to_onnx() 関数の全ロジックが実行された
+#     - FloatTensorType定義、convert_sklearn、SerializeToString が正しく動作
+#
+# 実装内容:
+#   - skl2onnx を使ってscikit-learnモデルをONNX形式に変換
+#   - FloatTensorType([None, 4]): 入力形状の定義（batch_size可変、4特徴量）
+#   - convert_sklearn(): scikit-learn → ONNX変換
+#   - SerializeToString(): ONNXモデルをバイト列にシリアライズ
+#   - ファイルに保存
+#
+# ONNX形式の利点:
+#   - プラットフォーム非依存: Python以外の環境でも推論可能
+#   - 最適化: ONNX Runtimeで高速推論
+#   - 互換性: 様々なフレームワーク間でモデル共有可能
+#
+# 全体の累積カバレッジ（exporter以外）:
+#   - data_loader.py: 14文（100%）
+#   - model.py: 6文（100%）
+#   - trainer.py: 5文（100%）
+#   - exporter.py: 8文（100%）
+#   - 合計: 33文（100%）
+#   ※evaluator.pyはこのテストでカバーされていないが、別途テスト済み
+#
+# TDDサイクル完了:
+#   Red（失敗）→ Green（成功）✓
+#   次のステップ: train.py（メインスクリプト）の実装へ
+#
+################################################################################

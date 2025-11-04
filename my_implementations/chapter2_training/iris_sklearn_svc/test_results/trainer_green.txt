@@ -1,0 +1,83 @@
+################################################################################
+# TDD Green Phase - trainer.py テスト結果（成功フェーズ）
+################################################################################
+#
+# 目的: モデル学習機能の実装を完了し、全てのテストが通ることを確認する
+# 状態: ✅ PASSED - 全テスト成功
+# 実行日時: trainer.py実装後
+# コマンド: pytest tests/test_trainer.py -v --cov=src/iris_sklearn_svc/trainer.py
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 8 items
+
+tests/test_trainer.py::TestTrainModel::test_train_model_returns_pipeline PASSED [ 12%]
+tests/test_trainer.py::TestTrainModel::test_trained_model_is_fitted PASSED [ 25%]
+tests/test_trainer.py::TestTrainModel::test_trained_model_can_predict_probabilities PASSED [ 37%]
+tests/test_trainer.py::TestTrainModel::test_predictions_are_valid_classes PASSED [ 50%]
+tests/test_trainer.py::TestTrainModel::test_model_achieves_reasonable_accuracy PASSED [ 62%]
+tests/test_trainer.py::TestTrainModel::test_scaler_is_fitted PASSED      [ 75%]
+tests/test_trainer.py::TestTrainModel::test_svc_is_fitted PASSED         [ 87%]
+tests/test_trainer.py::TestTrainModel::test_reproducibility PASSED       [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                  Stmts   Miss  Cover   Missing
+-------------------------------------------------------------------
+src/iris_sklearn_svc/__init__.py          0      0   100%
+src/iris_sklearn_svc/data_loader.py      14      0   100%
+src/iris_sklearn_svc/model.py             6      0   100%
+src/iris_sklearn_svc/trainer.py           5      0   100%
+-------------------------------------------------------------------
+TOTAL                                    25      0   100%
+
+============================== 8 passed in 2.05s ===============================
+
+################################################################################
+# Green Phase 分析
+################################################################################
+#
+# テスト結果サマリー:
+#   ✅ 全8テストケースが成功（PASSED）
+#   ✅ コードカバレッジ: 100%（trainer.py の5ステートメント全て実行）
+#   ✅ 実行時間: 2.05秒
+#
+# 成功したテストケース:
+#   1. test_train_model_returns_pipeline           - 学習後にPipelineが返される ✓
+#   2. test_trained_model_is_fitted                - モデルがfitされている ✓
+#   3. test_trained_model_can_predict_probabilities - 確率予測が可能 ✓
+#   4. test_predictions_are_valid_classes          - 予測が有効なクラスラベル（0,1,2） ✓
+#   5. test_model_achieves_reasonable_accuracy     - 学習精度90%以上達成 ✓
+#   6. test_scaler_is_fitted                       - StandardScalerがfit済み ✓
+#   7. test_svc_is_fitted                          - SVCがfit済み（support_vectors_あり） ✓
+#   8. test_reproducibility                        - 同じデータで再現性あり ✓
+#
+# カバレッジ詳細:
+#   - src/iris_sklearn_svc/trainer.py: 5文（100%カバー）
+#     - train_model() 関数の全ロジックが実行された
+#     - pipeline.fit(x_train, y_train) が正しく動作
+#
+# 実装内容:
+#   - シンプルな実装: pipeline.fit() を呼ぶだけ
+#   - パイプライン全体（StandardScaler + SVC）が一度に学習される
+#   - scikit-learnのPipelineの利点を活用
+#
+# 全体の累積カバレッジ:
+#   - data_loader.py: 14文（100%）
+#   - model.py: 6文（100%）
+#   - trainer.py: 5文（100%）
+#   - 合計: 25文（100%）
+#
+# TDDサイクル完了:
+#   Red（失敗）→ Green（成功）✓
+#   次のステップ: evaluator.py の実装へ
+#
+################################################################################

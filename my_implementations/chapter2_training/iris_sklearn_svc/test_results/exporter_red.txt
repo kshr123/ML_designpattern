@@ -1,0 +1,64 @@
+################################################################################
+# TDD Red Phase - exporter.py テスト結果（失敗フェーズ）
+################################################################################
+#
+# 目的: ONNX変換機能のテストを先に書き、実装がない状態で失敗することを確認する
+# 状態: ❌ FAILED - 期待通りの失敗
+# 実行日時: exporter.py実装前
+# テスト数: 9テストケース
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/my_implementations/chapter2_training/iris_sklearn_svc
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+___________________ ERROR collecting tests/test_exporter.py ____________________
+
+ImportError while importing test module:
+  tests/test_exporter.py:10: in <module>
+    from iris_sklearn_svc.exporter import export_to_onnx
+E   ModuleNotFoundError: No module named 'iris_sklearn_svc.exporter'
+
+=========================== short test summary info ============================
+ERROR tests/test_exporter.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 1.41s ===============================
+
+################################################################################
+# Red Phase 分析
+################################################################################
+#
+# エラー内容:
+#   - ModuleNotFoundError: モジュール 'iris_sklearn_svc.exporter' が見つからない
+#   - export_to_onnx 関数がインポートできない
+#
+# テスト対象:
+#   1. test_export_creates_file - ONNXファイルが作成されるか
+#   2. test_exported_file_is_valid_onnx - 有効なONNXモデルか
+#   3. test_onnx_model_passes_checker - ONNXチェッカーを通過するか
+#   4. test_onnx_model_has_correct_input_shape - 入力形状が正しいか（4次元）
+#   5. test_onnx_model_has_output - 出力ノードが存在するか
+#   6. test_export_with_different_path - 異なるパスでエクスポート可能か
+#   7. test_export_overwrites_existing_file - 既存ファイルを上書きできるか
+#   8. test_exported_model_metadata - メタデータが含まれるか
+#   9. test_file_size_is_reasonable - ファイルサイズが妥当か（1KB-10MB）
+#
+# これは正しいTDDの流れ:
+#   1. テストを先に書く（9個のテストケース）
+#   2. 実装がないのでテストが失敗する（Red）
+#   3. これから実装を書いてテストを通す（Green）
+#
+# 次のステップ:
+#   - src/iris_sklearn_svc/exporter.py を実装する
+#   - export_to_onnx(trained_model, output_path) 関数を作成する
+#   - skl2onnx を使ってscikit-learnモデルをONNX形式に変換
+#   - onnx.save() でファイルに保存
+#
+################################################################################
