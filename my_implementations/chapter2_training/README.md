@@ -17,8 +17,8 @@
 
 | パターン | 目的 | 難易度 | 状態 |
 |---------|------|--------|------|
-| **model_db** | モデル管理データベース | ⭐⭐⭐ | ✅ 完了 |
-| **iris_sklearn_svc** | Support Vector Classifier | ⭐ | ⏸️ 未着手 |
+| **01_model_db** | モデル管理データベース | ⭐⭐⭐ | ✅ 完了 |
+| **02_iris_sklearn_svc** | Support Vector Classifier + CI/CD | ⭐⭐ | ✅ 完了 ⭐ |
 | **iris_sklearn_rf** | Random Forest | ⭐ | ⏸️ 未着手 |
 | **iris_binary** | 二値分類 | ⭐ | ⏸️ 未着手 |
 | **iris_sklearn_outlier** | 外れ値検出 | ⭐⭐ | ⏸️ 未着手 |
@@ -30,19 +30,41 @@
 
 ```
 chapter2_training/
-├── README.md                    # このファイル
-├── model_db/                    # ✅ 完了
+├── README.md                       # このファイル
+├── 01_model_db/                    # ✅ 完了 (2025-11-04)
 │   ├── SPECIFICATION.md
 │   ├── README.md
 │   ├── pyproject.toml
 │   ├── run_server.py
 │   ├── src/
+│   │   ├── 01_configurations.py
+│   │   ├── api/
+│   │   └── db/
 │   └── tests/
+│       ├── 01_test_cruds.py
+│       └── 02_test_api.py
 │
-├── iris_sklearn_svc/           # ⏸️ 今後実装
-│   └── ...
+├── 02_iris_sklearn_svc/            # ✅ 完了 ⭐ (2025-11-04)
+│   ├── SPECIFICATION.md
+│   ├── README.md
+│   ├── pyproject.toml
+│   ├── src/
+│   │   └── iris_sklearn_svc/
+│   │       ├── 01_data_loader.py
+│   │       ├── 02_model.py
+│   │       ├── 03_trainer.py
+│   │       ├── 04_evaluator.py
+│   │       ├── 05_exporter.py
+│   │       └── 06_train.py
+│   └── tests/
+│       ├── 01_test_data_loader.py
+│       ├── 02_test_model.py
+│       ├── 03_test_trainer.py
+│       ├── 04_test_evaluator.py
+│       ├── 05_test_exporter.py
+│       └── 06_test_integration.py
 │
-├── iris_sklearn_rf/            # ⏸️ 今後実装
+├── iris_sklearn_rf/                # ⏸️ 今後実装
 │   └── ...
 │
 └── (その他のパターン)
@@ -94,47 +116,112 @@ chapter2_training/
 
 #### ディレクトリ
 ```
-model_db/
+01_model_db/
 ├── SPECIFICATION.md          # 詳細な仕様書
 ├── README.md                 # 実装ドキュメント
 ├── pyproject.toml            # 依存関係
 ├── run_server.py             # サーバー起動
 ├── src/
+│   ├── 01_configurations.py  # 設定
 │   ├── api/                  # FastAPI
-│   ├── db/                   # SQLAlchemy + CRUD
-│   └── configurations.py     # 設定
+│   │   └── 01_app.py
+│   └── db/                   # SQLAlchemy + CRUD
+│       ├── 01_models.py
+│       ├── 02_schemas.py
+│       ├── 03_cruds.py
+│       ├── 04_database.py
+│       └── 05_initialize.py
 └── tests/
-    ├── test_cruds.py         # ユニットテスト
-    └── test_api.py           # 統合テスト
+    ├── 01_test_cruds.py      # ユニットテスト
+    └── 02_test_api.py        # 統合テスト
 ```
 
 #### 参考
-- [詳細な実装ドキュメント](./model_db/README.md)
-- [仕様書](./model_db/SPECIFICATION.md)
+- [詳細な実装ドキュメント](./01_model_db/README.md)
+- [仕様書](./01_model_db/SPECIFICATION.md)
 - [学習記録](../../progress/learning_log.md#2025-11-04---model-db)
 
 ---
 
-## 📋 今後実装するパターン
+### ✅ iris_sklearn_svc - Support Vector Classifier + CI/CD ⭐
 
-### ⏸️ iris_sklearn_svc - Support Vector Classifier
+**完了日**: 2025-11-04
 
 #### 概要
-Irisデータセットを使ったSupport Vector Classifierの実装。
+Irisデータセットを使ったSupport Vector Classifierの実装。GitHub Actions による CI/CD、ONNX変換、統合テストまで含む。
 
-#### 学習ポイント
-- sklearn の基本的な使い方
-- データの前処理（標準化）
-- モデルの学習と評価
-- モデルの保存（pickle）
+#### 技術スタック
+- **ML**: scikit-learn (SVC)
+- **データ**: Iris データセット
+- **モデル変換**: skl2onnx → ONNX Runtime
+- **テスト**: pytest（ユニット + 統合）
+- **CI/CD**: GitHub Actions（test, lint, coverage）
+- **コード品質**: black, ruff, mypy
 
-#### 推奨実装順序
-2番目（model_db の次）
+#### 主な機能
+- データロードと前処理
+- SVCモデルの学習
+- モデルの評価（accuracy, precision, recall, F1）
+- ONNX形式への変換とエクスポート
+- MLflow統合（実験追跡）
 
-#### 参考コード
-`reference/chapter2_training/iris_sklearn_svc/`
+#### テスト
+- 52個のテストケース（100%カバレッジ）
+  - ユニットテスト: 42個
+  - 統合テスト: 10個（ONNX推論検証含む）
+
+#### CI/CD
+- 3つのGitHub Actionsワークフロー
+  1. `test.yml` - 自動テスト（ubuntu + macOS）
+  2. `lint.yml` - コード品質チェック
+  3. `coverage.yml` - カバレッジレポート
+
+#### 学んだこと
+- 統合テストとONNX推論検証
+- GitHub Actionsによる CI/CD自動化
+- モノレポでのワークフロー管理（paths + working-directory）
+- Python版とパッケージの互換性問題の解決
+- ONNX推論パターン（7パターン）の理解
+
+#### ディレクトリ
+```
+02_iris_sklearn_svc/
+├── SPECIFICATION.md
+├── README.md
+├── pyproject.toml
+├── src/iris_sklearn_svc/
+│   ├── 01_data_loader.py    # データロード
+│   ├── 02_model.py          # モデル定義
+│   ├── 03_trainer.py        # 学習
+│   ├── 04_evaluator.py      # 評価
+│   ├── 05_exporter.py       # ONNX変換
+│   └── 06_train.py          # メインスクリプト
+└── tests/
+    ├── 01_test_data_loader.py
+    ├── 02_test_model.py
+    ├── 03_test_trainer.py
+    ├── 04_test_evaluator.py
+    ├── 05_test_exporter.py
+    └── 06_test_integration.py  # E2E + ONNX検証
+```
+
+#### 成果物
+- ドキュメント
+  - [GitHub Actions 完全ガイド](../../../notes/05_github_actions_guide.md) (873行)
+  - [ONNX推論パターン完全ガイド](../../../notes/06_onnx_inference_patterns.md) (1400行超)
+- CI/CD
+  - `.github/workflows/test.yml`
+  - `.github/workflows/lint.yml`
+  - `.github/workflows/coverage.yml`
+
+#### 参考
+- [詳細な実装ドキュメント](./02_iris_sklearn_svc/README.md)
+- [仕様書](./02_iris_sklearn_svc/SPECIFICATION.md)
+- [学習記録](../../progress/learning_log.md#2025-11-04---iris_sklearn_svc--github-actions--onnx推論-)
 
 ---
+
+## 📋 今後実装するパターン
 
 ### ⏸️ iris_sklearn_rf - Random Forest
 
@@ -147,7 +234,7 @@ Irisデータセットを使ったRandom Forestの実装。
 - 特徴量の重要度分析
 
 #### 推奨実装順序
-3番目
+3番目（iris_sklearn_svc の次）
 
 #### 参考コード
 `reference/chapter2_training/iris_sklearn_rf/`
@@ -426,11 +513,11 @@ def download_iris_data():
 ### 推奨順序
 
 ```
-1. model_db (完了)
+1. 01_model_db (✅ 完了)
    ↓ データベース操作、API設計を学ぶ
 
-2. iris_sklearn_svc
-   ↓ sklearn の基礎を学ぶ
+2. 02_iris_sklearn_svc (✅ 完了) ⭐
+   ↓ sklearn の基礎、CI/CD、ONNX推論を学ぶ
 
 3. iris_sklearn_rf
    ↓ アンサンブル学習を学ぶ
@@ -447,14 +534,14 @@ def download_iris_data():
 
 ### 各パターンの学習時間目安
 
-| パターン | 学習時間 | 実装時間 |
-|---------|---------|---------|
-| model_db | 4-6時間 | ✅ 完了 |
-| iris_sklearn_svc | 2-3時間 | 未着手 |
-| iris_sklearn_rf | 2-3時間 | 未着手 |
-| iris_binary | 2-3時間 | 未着手 |
-| iris_sklearn_outlier | 3-4時間 | 未着手 |
-| cifar10 | 6-8時間 | 未着手 |
+| パターン | 学習時間 | 実装時間 | 状態 |
+|---------|---------|---------|------|
+| 01_model_db | 4-6時間 | 1日 | ✅ 完了 |
+| 02_iris_sklearn_svc | 5-7時間 | 1日 | ✅ 完了 ⭐ |
+| iris_sklearn_rf | 2-3時間 | - | 未着手 |
+| iris_binary | 2-3時間 | - | 未着手 |
+| iris_sklearn_outlier | 3-4時間 | - | 未着手 |
+| cifar10 | 6-8時間 | - | 未着手 |
 
 ---
 
@@ -509,13 +596,13 @@ cp -r ../../../../reference/chapter2_training/iris_sklearn_svc/* .
 
 ```
 最低限:
-✅ model_db (完了)
-✅ 1つの機械学習パターン（iris_*）
+✅ 01_model_db (完了)
+✅ 02_iris_sklearn_svc (完了) ⭐
 
 推奨:
-✅ model_db (完了)
-✅ iris_sklearn_svc
-✅ cifar10
+✅ 01_model_db (完了)
+✅ 02_iris_sklearn_svc (完了) ⭐
+⏸️ cifar10
 ```
 
 ---

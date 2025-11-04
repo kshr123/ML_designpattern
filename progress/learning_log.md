@@ -5,10 +5,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 1 / 26 パターン |
+| **完了パターン数** | 2 / 26 パターン |
 | **現在の章** | Chapter 2: Training |
-| **最新の完了** | Model DB (2025-11-04) |
-| **次の目標** | Iris分類パターン（iris_sklearn_svc） |
+| **最新の完了** | iris_sklearn_svc + GitHub Actions (2025-11-04) |
+| **次の目標** | 次のパターン選定 |
 
 ---
 
@@ -53,7 +53,7 @@
 - [ ] iris_binary
 - [ ] iris_sklearn_outlier
 - [ ] iris_sklearn_rf
-- [ ] iris_sklearn_svc
+- [x] iris_sklearn_svc (完了: 2025-11-04) ⭐
 - [x] model_db (完了: 2025-11-04)
 
 ### Chapter 3: Release Patterns（リリースパターン）
@@ -344,6 +344,142 @@ python run_server.py
 - エンドポイントのパス区切りはハイフン（`project-id`）を使用
 - 評価更新は `PATCH` ではなく `POST` メソッド
 - エンドポイントパスは仕様書と実装で一致することを確認済み
+
+---
+
+### 2025-11-04 - iris_sklearn_svc + GitHub Actions + ONNX推論 ⭐
+
+#### 学んだこと
+
+**1. 統合テストとONNX推論検証**
+- ONNX Runtime を使った推論結果の検証方法
+- scikit-learnとONNXの予測結果の一致確認
+- 統合テスト（E2Eテスト）の重要性
+- fixtureを使った効率的なテストデータ管理
+
+**2. GitHub Actions による CI/CD**
+- ワークフロー配置: リポジトリルートの `.github/workflows/`
+- モノレポ対応: `paths` フィルタと `working-directory`
+- マトリックス戦略: 複数OS・Python版での自動テスト
+- 依存関係の競合解決: Python版とパッケージ互換性
+
+**3. トラブルシューティング実践**
+- Python 3.14 (prerelease) とonnxruntimeの互換性問題
+- `allow-prereleases: false` の重要性
+- エラーログからの原因特定と修正プロセス
+
+**4. ONNX推論パターンの理解**
+- 7つの推論パターン（同期、バッチ、非同期、ストリーミング、REST API、gRPC、サーバーレス）
+- パターン選択の基準とシナリオ別推奨
+- 実装順序と学習ロードマップ
+
+#### 実装のポイント
+
+**統合テスト**
+- 10個のテストケース作成
+  - E2Eパイプライン（3テスト）
+  - ONNX推論検証（4テスト）
+  - エッジケース（3テスト）
+- onnxruntime を使った推論検証
+- 全テストパス（10 passed in 2.23s）
+
+**GitHub Actions ワークフロー**
+- 3つのワークフロー作成
+  1. `test.yml` - 自動テスト（ubuntu + macOS）
+  2. `lint.yml` - コード品質チェック（black, ruff, mypy）
+  3. `coverage.yml` - カバレッジレポート
+- パス指定で iris_sklearn_svc のみトリガー
+- Codecov 統合によるカバレッジ追跡
+
+**コード品質改善**
+- black による自動フォーマット（12ファイル）
+- ruff による未使用import削除（3ファイル）
+- mypy による型チェック（型ヒント追加）
+- 全ての品質チェックパス
+
+#### 成果物
+
+**実装**
+- `my_implementations/chapter2_training/02_iris_sklearn_svc/`
+  - 統合テスト（10テストケース）
+  - 100%のテストカバレッジ（ユーティリティモジュール）
+
+**ドキュメント**
+- `notes/01_github_actions_guide.md` - GitHub Actions完全ガイド（873行）
+- `notes/02_onnx_inference_patterns.md` - ONNX推論パターン完全ガイド（1400行超）
+
+**CI/CD**
+- `.github/workflows/test.yml`
+- `.github/workflows/lint.yml`
+- `.github/workflows/coverage.yml`
+
+#### メトリクス
+
+- **実装期間**: 1日
+- **統合テスト数**: 10個
+- **ワークフロー数**: 3個
+- **ドキュメント作成**: 2個（計2,273行）
+- **GitHub Actions**: ✅ 全て成功
+- **コード品質**: ✅ lint/format/type全てパス
+
+#### トラブルシューティング記録
+
+**問題1: 統合テストでModuleNotFoundError**
+- 原因: パッケージが未インストール
+- 解決: `uv pip install -e .`
+
+**問題2: GitHub Actions - ワークフロー配置ミス**
+- 原因: サブプロジェクトに `.github/` を作成
+- 解決: リポジトリルートに移動 + paths フィルタ追加
+
+**問題3: GitHub Actions - Python 3.14互換性エラー**
+- 原因: `requires-python = ">=3.13"` がPython 3.14をインストール
+- 解決: `python-version: ["3.13"]` + `allow-prereleases: false`
+
+**問題4: コード品質チェック失敗**
+- 原因: フォーマット、未使用import、型ヒント不足
+- 解決: black/ruff/mypy で自動修正
+
+#### 重要な気づき
+
+**GitHub Actions のベストプラクティス**
+- ワークフローはリポジトリルート配置が必須
+- モノレポでは `paths` + `working-directory` で効率化
+- Python版は明示的に指定（`allow-prereleases: false`）
+- 依存関係の互換性を事前に確認
+
+**ONNX推論の理解**
+- 同期推論が最もシンプルで学習に最適
+- パターン選択は要件次第（トラフィック、レイテンシ、スケール）
+- 実装順序: 同期 → バッチ → REST API → 非同期 → 高度なパターン
+
+**テスト駆動開発の効果**
+- 統合テストで全体の動作を保証
+- エッジケースを明示的にテスト
+- CI/CDで自動検証による安心感
+
+#### プロジェクト整理
+
+**ファイル名への接頭番号付け**
+- プロジェクト: `01_model_db/`, `02_iris_sklearn_svc/`
+- ソースファイル: `01_data_loader.py`, `02_model.py`, ...
+- テストファイル: `01_test_data_loader.py`, `02_test_model.py`, ...
+- メリット: 作成順・処理フローが一目瞭然
+
+#### 次のステップ候補
+
+**Chapter 2: Training の残り**
+- [ ] cifar10 - CNN画像分類
+- [ ] iris_binary - 二値分類
+- [ ] iris_sklearn_rf - ランダムフォレスト
+- [ ] iris_sklearn_outlier - 外れ値検出
+
+**Chapter 4: Serving Patterns（推奨）**
+- [ ] synchronous_pattern - 同期推論（ONNX知識を活用）
+- [ ] batch_pattern - バッチ推論
+- [ ] asynchronous_pattern - 非同期推論
+
+**推奨**: ONNX推論パターンの知識を活かして Chapter 4 の推論パターンに進む
 
 ---
 
