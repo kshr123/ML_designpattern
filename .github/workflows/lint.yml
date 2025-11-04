@@ -1,14 +1,23 @@
-name: Code Quality
+name: Code Quality - iris_sklearn_svc
 
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/lint.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/lint.yml'
 
 jobs:
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: my_implementations/chapter2_training/iris_sklearn_svc
 
     steps:
     - uses: actions/checkout@v4

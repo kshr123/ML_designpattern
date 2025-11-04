@@ -1,14 +1,23 @@
-name: Tests
+name: Tests - iris_sklearn_svc
 
 on:
   push:
     branches: [ main, develop ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/test.yml'
   pull_request:
     branches: [ main, develop ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/test.yml'
 
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: my_implementations/chapter2_training/iris_sklearn_svc
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]

@@ -1,14 +1,23 @@
-name: Coverage Report
+name: Coverage Report - iris_sklearn_svc
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/coverage.yml'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'my_implementations/chapter2_training/iris_sklearn_svc/**'
+      - '.github/workflows/coverage.yml'
 
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: my_implementations/chapter2_training/iris_sklearn_svc
 
     steps:
     - uses: actions/checkout@v4
