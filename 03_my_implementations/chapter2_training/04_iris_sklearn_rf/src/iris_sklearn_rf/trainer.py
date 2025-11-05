@@ -1,7 +1,7 @@
 """
-Model training and evaluation module.
+モデルの学習と評価モジュール。
 
-This module provides functions to train and evaluate machine learning models.
+このモジュールは機械学習モデルの学習と評価を行う機能を提供します。
 """
 
 from typing import Dict
@@ -13,15 +13,15 @@ from sklearn.pipeline import Pipeline
 
 def train_model(pipeline: Pipeline, X_train: np.ndarray, y_train: np.ndarray) -> Pipeline:
     """
-    Train the model pipeline.
+    モデルパイプラインを学習する。
 
     Args:
-        pipeline: Scikit-learn Pipeline to train
-        X_train: Training feature matrix
-        y_train: Training target vector
+        pipeline: 学習するscikit-learn Pipeline
+        X_train: 訓練用特徴量行列
+        y_train: 訓練用ターゲットベクトル
 
     Returns:
-        Pipeline: Fitted pipeline
+        Pipeline: 学習済みパイプライン
     """
     pipeline.fit(X_train, y_train)
     return pipeline
@@ -29,25 +29,25 @@ def train_model(pipeline: Pipeline, X_train: np.ndarray, y_train: np.ndarray) ->
 
 def evaluate_model(pipeline: Pipeline, X_test: np.ndarray, y_test: np.ndarray) -> Dict[str, float]:
     """
-    Evaluate the trained model.
+    学習済みモデルを評価する。
 
     Args:
-        pipeline: Fitted scikit-learn Pipeline
-        X_test: Test feature matrix
-        y_test: Test target vector
+        pipeline: 学習済みscikit-learn Pipeline
+        X_test: テスト用特徴量行列
+        y_test: テスト用ターゲットベクトル
 
     Returns:
-        Dict[str, float]: Dictionary containing evaluation metrics:
-            - accuracy: Overall accuracy
-            - f1_score_macro: Macro-averaged F1 score
-            - f1_score_weighted: Weighted F1 score
-            - precision_macro: Macro-averaged precision
-            - recall_macro: Macro-averaged recall
+        Dict[str, float]: 評価メトリクスの辞書:
+            - accuracy: 全体の正解率
+            - f1_score_macro: マクロ平均F1スコア
+            - f1_score_weighted: 重み付きF1スコア
+            - precision_macro: マクロ平均適合率
+            - recall_macro: マクロ平均再現率
     """
-    # Make predictions
+    # 予測の実行
     y_pred = pipeline.predict(X_test)
 
-    # Calculate metrics
+    # メトリクスの計算
     metrics = {
         "accuracy": accuracy_score(y_test, y_pred),
         "f1_score_macro": f1_score(y_test, y_pred, average="macro"),

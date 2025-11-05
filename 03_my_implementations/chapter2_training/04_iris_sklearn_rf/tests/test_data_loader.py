@@ -1,7 +1,7 @@
 """
-Unit tests for data_loader module.
+data_loaderモジュールのユニットテスト。
 
-Tests the data loading and splitting functionality for the Iris dataset.
+Irisデータセットの読み込みと分割機能をテストします。
 """
 
 import numpy as np

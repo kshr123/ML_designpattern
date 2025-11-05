@@ -1,16 +1,17 @@
 name: Tests - iris_sklearn_svc
 
 on:
-  push:
-    branches: [ main, develop ]
-    paths:
-      - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
-      - '.github/workflows/test.yml'
-  pull_request:
-    branches: [ main, develop ]
-    paths:
-      - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
-      - '.github/workflows/test.yml'
+  workflow_dispatch:  # 手動実行のみ
+  # push:
+  #   branches: [ main, develop ]
+  #   paths:
+  #     - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
+  #     - '.github/workflows/test.yml'
+  # pull_request:
+  #   branches: [ main, develop ]
+  #   paths:
+  #     - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
+  #     - '.github/workflows/test.yml'
 
 jobs:
   test:

@@ -1,8 +1,8 @@
 """
-Model definition module for Random Forest classifier.
+ランダムフォレスト分類器のモデル定義モジュール。
 
-This module provides functions to create a scikit-learn Pipeline with
-StandardScaler and RandomForestClassifier.
+このモジュールはStandardScalerとRandomForestClassifierを
+組み合わせたscikit-learn Pipelineを作成する機能を提供します。
 """
 
 from typing import Optional
@@ -20,26 +20,26 @@ def create_rf_pipeline(
     random_state: int = 42,
 ) -> Pipeline:
     """
-    Create a Random Forest classification pipeline.
+    ランダムフォレスト分類パイプラインを作成する。
 
-    The pipeline consists of:
-    1. StandardScaler: Normalize features to mean=0, std=1
-    2. RandomForestClassifier: Ensemble classifier
+    パイプラインの構成:
+    1. StandardScaler: 特徴量を平均0、分散1に正規化
+    2. RandomForestClassifier: アンサンブル分類器
 
     Args:
-        n_estimators: Number of trees in the forest
-        max_depth: Maximum depth of trees (None for unlimited)
-        min_samples_split: Minimum samples required to split an internal node
-        min_samples_leaf: Minimum samples required to be at a leaf node
-        random_state: Random state for reproducibility
+        n_estimators: フォレスト内の決定木の数
+        max_depth: 木の最大深さ（Noneで無制限）
+        min_samples_split: 内部ノード分割に必要な最小サンプル数
+        min_samples_leaf: 葉ノードに必要な最小サンプル数
+        random_state: 再現性のための乱数シード
 
     Returns:
-        Pipeline: A scikit-learn Pipeline object
+        Pipeline: scikit-learn Pipelineオブジェクト
     """
-    # Create the scaler
+    # スケーラーの作成
     scaler = StandardScaler()
 
-    # Create the classifier
+    # 分類器の作成
     classifier = RandomForestClassifier(
         n_estimators=n_estimators,
         max_depth=max_depth,
@@ -48,7 +48,7 @@ def create_rf_pipeline(
         random_state=random_state,
     )
 
-    # Create the pipeline
+    # パイプラインの作成
     pipeline = Pipeline([("scaler", scaler), ("classifier", classifier)])
 
     return pipeline

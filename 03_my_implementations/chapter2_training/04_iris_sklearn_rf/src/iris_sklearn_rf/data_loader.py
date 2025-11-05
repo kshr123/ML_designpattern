@@ -1,8 +1,8 @@
 """
-Data loading module for Iris dataset.
+Irisデータセットの読み込みモジュール。
 
-This module provides functions to load the Iris dataset and split it into
-training and testing sets.
+このモジュールはIrisデータセットの読み込みと、
+訓練/テストセットへの分割機能を提供します。
 """
 
 from typing import Tuple
@@ -14,12 +14,12 @@ from sklearn.model_selection import train_test_split
 
 def load_iris_data() -> Tuple[np.ndarray, np.ndarray]:
     """
-    Load the Iris dataset.
+    Irisデータセットを読み込む。
 
     Returns:
-        Tuple[np.ndarray, np.ndarray]: A tuple of (X, y) where:
-            - X: Feature matrix of shape (150, 4)
-            - y: Target vector of shape (150,) with 3 classes (0, 1, 2)
+        Tuple[np.ndarray, np.ndarray]: (X, y)のタプル
+            - X: 特徴量行列 (150, 4)
+            - y: ターゲットベクトル (150,) - 3クラス (0, 1, 2)
     """
     iris = load_iris()
     X = iris.data
@@ -35,14 +35,14 @@ def split_data(
     stratify: bool = True,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
-    Split data into training and testing sets.
+    データを訓練セットとテストセットに分割する。
 
     Args:
-        X: Feature matrix
-        y: Target vector
-        test_size: Proportion of the dataset to include in the test split
-        random_state: Random state for reproducibility
-        stratify: If True, stratify the split to maintain class distribution
+        X: 特徴量行列
+        y: ターゲットベクトル
+        test_size: テストセットの割合
+        random_state: 再現性のための乱数シード
+        stratify: Trueの場合、クラス分布を維持して分割
 
     Returns:
         Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:

@@ -1,16 +1,17 @@
 name: Coverage Report - iris_sklearn_svc
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
-      - '.github/workflows/coverage.yml'
-  pull_request:
-    branches: [ main ]
-    paths:
-      - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
-      - '.github/workflows/coverage.yml'
+  workflow_dispatch:  # 手動実行のみ
+  # push:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
+  #     - '.github/workflows/coverage.yml'
+  # pull_request:
+  #   branches: [ main ]
+  #   paths:
+  #     - 'my_implementations/chapter2_training/02_iris_sklearn_svc/**'
+  #     - '.github/workflows/coverage.yml'
 
 jobs:
   coverage:

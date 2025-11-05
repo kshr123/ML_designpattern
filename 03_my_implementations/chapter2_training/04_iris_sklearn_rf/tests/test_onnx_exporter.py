@@ -1,7 +1,7 @@
 """
-Unit tests for onnx_exporter module.
+onnx_exporterモジュールのユニットテスト。
 
-Tests the ONNX model export and validation functionality.
+ONNXモデルのエクスポートと検証機能をテストします。
 """
 
 import os

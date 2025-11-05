@@ -1,7 +1,7 @@
 """
-Unit tests for model module.
+modelモジュールのユニットテスト。
 
-Tests the model pipeline construction and configuration.
+モデルパイプラインの構築と設定をテストします。
 """
 
 from sklearn.ensemble import RandomForestClassifier

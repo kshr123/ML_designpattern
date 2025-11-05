@@ -1,7 +1,7 @@
 """
-Unit tests for trainer module.
+trainerモジュールのユニットテスト。
 
-Tests the model training and evaluation functionality.
+モデルの学習と評価機能をテストします。
 """
 
 from sklearn.pipeline import Pipeline
