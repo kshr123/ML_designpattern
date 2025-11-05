@@ -19,8 +19,8 @@
 |---------|------|--------|------|
 | **01_model_db** | モデル管理データベース | ⭐⭐⭐ | ✅ 完了 |
 | **02_iris_sklearn_svc** | Support Vector Classifier + CI/CD | ⭐⭐ | ✅ 完了 ⭐ |
+| **03_iris_binary** | 二値分類 + MLflow | ⭐⭐ | ✅ 完了 |
 | **iris_sklearn_rf** | Random Forest | ⭐ | ⏸️ 未着手 |
-| **iris_binary** | 二値分類 | ⭐ | ⏸️ 未着手 |
 | **iris_sklearn_outlier** | 外れ値検出 | ⭐⭐ | ⏸️ 未着手 |
 | **cifar10** | 画像分類（CNN） | ⭐⭐⭐ | ⏸️ 未着手 |
 
@@ -218,6 +218,92 @@ Irisデータセットを使ったSupport Vector Classifierの実装。GitHub Ac
 - [詳細な実装ドキュメント](./02_iris_sklearn_svc/README.md)
 - [仕様書](./02_iris_sklearn_svc/SPECIFICATION.md)
 - [学習記録](../../progress/learning_log.md#2025-11-04---iris_sklearn_svc--github-actions--onnx推論-)
+
+---
+
+### ✅ iris_binary - 二値分類 + MLflow
+
+**完了日**: 2025-11-05
+
+#### 概要
+Irisデータセット（3クラス）を二値分類問題に変換し、SVCで学習。MLflowによる実験管理を実践。
+
+#### 技術スタック
+- **ML**: scikit-learn (SVC), numpy
+- **実験管理**: MLflow（パラメータ・メトリクス・モデル記録）
+- **モデル変換**: ONNX (skl2onnx, onnxruntime)
+- **テスト**: pytest（ユニット + 統合）
+- **コード品質**: black, ruff, mypy
+
+#### 主な機能
+- 二値分類変換（One-vs-Rest戦略）
+- SVCモデルの学習（StandardScaler + SVC pipeline）
+- 評価指標の計算（Accuracy, Precision, Recall）
+- ONNX形式への変換とエクスポート
+- MLflow統合（実験追跡）
+
+#### テスト
+- 34個のテストケース（97%成功率）
+  - ユニットテスト: 28個
+  - 統合テスト: 6個（E2Eパイプライン + ONNX検証）
+
+#### ドキュメント
+- **README.md**: 490行の完全ガイド
+  - 概要、アーキテクチャ、セットアップ、使い方
+  - MLflow UI の使い方
+  - テスト、学んだこと
+
+#### コード品質
+- Black: ✅ すべてのファイルがフォーマット済み
+- Ruff: ✅ エラー・警告なし
+- Mypy: ⚠️ 外部ライブラリのスタブ不足のみ（許容）
+
+#### 学んだこと
+- 二値分類の基本概念（One-vs-Rest戦略）
+- 評価指標の使い分け（Accuracy, Precision, Recall）
+- MLflow実験管理の実践
+- ONNX変換と推論検証
+- ドキュメンテーションのベストプラクティス
+- テスト結果・コード品質管理のポリシー確立
+
+#### ディレクトリ
+```
+03_iris_binary/
+├── SPECIFICATION.md
+├── README.md (490行)
+├── pyproject.toml
+├── .gitignore
+├── run_experiment.py          # 実験実行スクリプト
+├── src/iris_binary/
+│   ├── data_loader.py         # データ読み込み・二値化
+│   ├── model.py               # SVCパイプライン構築
+│   ├── trainer.py             # 学習・評価
+│   ├── exporter.py            # ONNX変換
+│   └── mlflow_manager.py      # MLflow統合
+├── tests/
+│   ├── test_01_data_loader.py
+│   ├── test_02_model.py
+│   ├── test_03_trainer.py
+│   ├── test_04_exporter.py
+│   ├── test_05_mlflow_manager.py
+│   ├── test_06_integration.py
+│   └── test_results/
+│       └── README.md          # pytest出力の読み方
+└── quality_checks/
+    └── README.md              # コード品質チェック結果の読み方
+```
+
+#### 成果物
+- ドキュメント
+  - [詳細な実装ドキュメント](./03_iris_binary/README.md)
+  - [仕様書](./03_iris_binary/SPECIFICATION.md)
+  - pytest出力の読み方ガイド
+  - コード品質チェック結果の読み方ガイド
+
+#### 参考
+- [詳細な実装ドキュメント](./03_iris_binary/README.md)
+- [仕様書](./03_iris_binary/SPECIFICATION.md)
+- [学習記録](../../progress/learning_log.md#2025-11-05---iris_binary二値分類--mlflow)
 
 ---
 

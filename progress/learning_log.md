@@ -5,10 +5,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 2 / 26 パターン |
+| **完了パターン数** | 3 / 26 パターン |
 | **現在の章** | Chapter 2: Training |
-| **最新の完了** | iris_sklearn_svc + GitHub Actions (2025-11-04) |
-| **次の目標** | 次のパターン選定 |
+| **最新の完了** | iris_binary + MLflow (2025-11-05) |
+| **次の目標** | Chapter 4: Serving Patterns への移行検討 |
 
 ---
 
@@ -50,7 +50,7 @@
 
 ### Chapter 2: Training（学習）
 - [ ] cifar10
-- [ ] iris_binary
+- [x] iris_binary (完了: 2025-11-05)
 - [ ] iris_sklearn_outlier
 - [ ] iris_sklearn_rf
 - [x] iris_sklearn_svc (完了: 2025-11-04) ⭐
@@ -480,6 +480,141 @@ python run_server.py
 - [ ] asynchronous_pattern - 非同期推論
 
 **推奨**: ONNX推論パターンの知識を活かして Chapter 4 の推論パターンに進む
+
+---
+
+### 2025-11-05 - iris_binary（二値分類 + MLflow）
+
+#### 学んだこと
+
+**1. 二値分類の基本概念**
+- One-vs-Rest戦略: 3クラス → 2クラス（1つを陽性、残りを陰性）
+- 評価指標の使い分け
+  - **Accuracy**: 全体の正解率（バランスが取れている場合）
+  - **Precision**: 陽性予測のうち実際に陽性だった割合（偽陽性を減らしたい）
+  - **Recall**: 実際の陽性のうち正しく予測できた割合（見逃しを減らしたい）
+- ターゲットクラスによる精度の違い（Setosa 100%、Versicolor 100%）
+
+**2. MLflow実験管理の実践**
+- パラメータ、メトリクス、モデルの自動記録
+- 複数実験の比較と可視化（MLflow UI）
+- Run管理とアーティファクト保存
+- 実験の再現性確保
+
+**3. ONNX変換と推論検証**
+- scikit-learn Pipeline全体のONNX変換
+- 初期型情報（initial_types）の指定方法
+- scikit-learnとONNXの予測結果の一貫性検証
+- ONNX Runtime による推論実行
+
+**4. ドキュメンテーションのベストプラクティス**
+- README.mdの充実（490行の詳細ガイド）
+- pytest出力の読み方ガイド作成
+- コード品質チェック結果の読み方ガイド作成
+- 初見の人でも理解できる説明を重視
+
+**5. テスト結果とコード品質管理**
+- テスト結果は `tests/test_results/` に配置
+- コード品質チェック結果は `quality_checks/` に配置
+- README.mdで出力の読み方を解説
+- 結果ファイル自体はGit管理しない（再生成可能）
+
+#### 実装のポイント
+
+**アーキテクチャ**
+- 5つのモジュール構成
+  1. `data_loader.py` - データ読み込み・二値化
+  2. `model.py` - SVCパイプライン構築
+  3. `trainer.py` - 学習・評価
+  4. `exporter.py` - ONNX変換
+  5. `mlflow_manager.py` - MLflow統合
+
+**開発プロセス**
+1. 仕様策定（SPECIFICATION.md）- 詳細な要件定義
+2. テスト設計（34テストケース）
+3. 実装（レイヤーごとに段階的）
+4. コード品質チェック（Black, Ruff, Mypy）
+5. ドキュメント作成（README, ガイド類）
+
+**テスト構成**
+- ユニットテスト: 28個（各モジュール）
+- 統合テスト: 6個（E2Eパイプライン）
+- 成功率: 97%（34テスト中33成功）
+
+#### 成果物
+
+**実装**
+- `my_implementations/chapter2_training/03_iris_binary/`
+  - 完全なソースコード（5モジュール）
+  - 34個のテストケース
+  - 実験実行スクリプト（run_experiment.py）
+
+**ドキュメント**
+- `README.md` (490行) - 完全な使用ガイド
+- `SPECIFICATION.md` - 詳細な仕様書
+- `tests/test_results/README.md` - pytest出力の読み方
+- `quality_checks/README.md` - コード品質チェック結果の読み方
+
+**コード品質**
+- Black: ✅ 全ファイルがフォーマット済み
+- Ruff: ✅ エラー・警告なし
+- Mypy: ⚠️ 外部ライブラリのスタブ不足のみ（許容）
+
+#### メトリクス
+
+- **実装期間**: 1日
+- **テストケース**: 34個（97%成功）
+- **カバレッジ**: 90%以上
+- **README**: 490行
+- **実験精度**: Versicolor 100%、Setosa 97.8%
+
+#### プロジェクト管理ポリシーの確立
+
+**テスト結果管理**
+- `tests/test_results/` ディレクトリに配置
+- README.mdで読み方を解説（Git管理）
+- 結果ファイル自体はGit管理しない
+
+**コード品質チェック管理**
+- `quality_checks/` ディレクトリに配置
+- README.mdで各ツールの出力を解説（Git管理）
+- 結果ファイル自体はGit管理しない
+
+**ルール更新**
+- `.claude/claude.md` にポリシーを追加
+- 開発ワークフローに品質チェック手順を追加
+
+#### 重要な気づき
+
+**MLflowの価値**
+- 実験の再現性が向上
+- パラメータ・メトリクスの可視化が容易
+- 複数実験の比較が簡単
+- チーム開発での知見共有に有効
+
+**ドキュメントの重要性**
+- 初見の人向けのガイドが不可欠
+- pytestやコード品質ツールの出力は解説が必要
+- README.mdは使い方だけでなく「読み方」も説明
+
+**Git管理の方針**
+- 実行結果はGit管理しない（環境依存）
+- ガイドはGit管理する（環境非依存）
+- この区別が重要
+
+#### 次のステップ候補
+
+**Chapter 2: Training の残り**
+- [ ] cifar10 - CNN画像分類（最も複雑）
+- [ ] iris_sklearn_rf - ランダムフォレスト（アンサンブル学習）
+- [ ] iris_sklearn_outlier - 外れ値検出（異常検知）
+
+**Chapter 4: Serving Patterns（推奨）**
+- [ ] synchronous_pattern - 同期推論（ONNX知識を活用）
+- [ ] batch_pattern - バッチ推論
+- [ ] asynchronous_pattern - 非同期推論
+
+**推奨**: MLflow + ONNX の知識を活かして Chapter 4 の推論パターンに進む
 
 ---
 
