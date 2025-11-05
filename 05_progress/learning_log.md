@@ -21,11 +21,11 @@
 
 ### Chapter 2: Training（学習）
 - [x] **01_model_db** (完了: 2025-11-04)
-  - 詳細: [my_implementations/chapter2_training/01_model_db/README.md](../my_implementations/chapter2_training/01_model_db/README.md)
+  - 詳細: [03_my_implementations/chapter2_training/01_model_db/README.md](../03_my_implementations/chapter2_training/01_model_db/README.md)
 - [x] **02_iris_sklearn_svc** (完了: 2025-11-04)
-  - 詳細: [my_implementations/chapter2_training/02_iris_sklearn_svc/README.md](../my_implementations/chapter2_training/02_iris_sklearn_svc/README.md)
+  - 詳細: [03_my_implementations/chapter2_training/02_iris_sklearn_svc/README.md](../03_my_implementations/chapter2_training/02_iris_sklearn_svc/README.md)
 - [x] **03_iris_binary** (完了: 2025-11-05)
-  - 詳細: [my_implementations/chapter2_training/03_iris_binary/README.md](../my_implementations/chapter2_training/03_iris_binary/README.md)
+  - 詳細: [03_my_implementations/chapter2_training/03_iris_binary/README.md](../03_my_implementations/chapter2_training/03_iris_binary/README.md)
 - [ ] cifar10
 - [ ] iris_sklearn_outlier
 - [ ] iris_sklearn_rf
@@ -78,5 +78,5 @@
 ## 📚 参考情報
 
 - **プロジェクトルール**: [.claude/claude.md](../.claude/claude.md)
-- **Chapter 2 進捗**: [my_implementations/chapter2_training/README.md](../my_implementations/chapter2_training/README.md)
+- **Chapter 2 進捗**: [03_my_implementations/chapter2_training/README.md](../03_my_implementations/chapter2_training/README.md)
 - **全体進捗**: [README.md](../README.md)

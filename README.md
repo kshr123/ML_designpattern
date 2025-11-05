@@ -2,20 +2,22 @@
 
 ## 📁 プロジェクト構造
 
+**フロー順に連番を付けて整理**
+
 ```
 .
-├── reference/              # 参考リポジトリ（クローン元）
+├── 01_reference/           # 参考リポジトリ（クローン元）
 │   └── ml-system-in-actions/
-├── my_implementations/     # 自分で実装したコード
-├── templates/              # テンプレートファイル
+├── 02_templates/           # テンプレートファイル
 │   ├── SPECIFICATION.template.md
 │   ├── pyproject.toml.template
 │   └── test_*.template.py
-├── docs/                   # ドキュメント
-│   └── DEVELOPMENT_WORKFLOW.md
-├── notes/                  # 学習ノート・メモ
-└── progress/               # 進捗記録
-    └── learning_log.md     # 学習進捗ログ
+├── 03_my_implementations/  # 自分で実装したコード
+├── 04_notes/               # 学習ノート・メモ
+├── 05_progress/            # 進捗記録
+│   └── learning_log.md     # 学習進捗ログ
+└── 06_docs/                # ドキュメント
+    └── DEVELOPMENT_WORKFLOW.md
 ```
 
 ## 🎯 プロジェクトの目的
@@ -70,10 +72,10 @@ uv python install 3.13
 
 ```bash
 # 新しいパターンを実装する場合
-cd my_implementations/ch{N}__{pattern_name}
+cd 03_my_implementations/chapter{N}__{category}/{NN}_{pattern_name}
 
 # pyproject.tomlをテンプレートからコピー
-cp ../../templates/pyproject.toml.template pyproject.toml
+cp ../../../02_templates/pyproject.toml.template pyproject.toml
 
 # 仮想環境の作成
 uv venv
@@ -89,7 +91,7 @@ uv pip install -e ".[dev]"
 
 ### 新しいパターンを実装する
 
-**詳細な手順は [DEVELOPMENT_WORKFLOW.md](./docs/DEVELOPMENT_WORKFLOW.md) を参照**
+**詳細な手順は [DEVELOPMENT_WORKFLOW.md](./06_docs/DEVELOPMENT_WORKFLOW.md) を参照**
 
 1. **理解**: 参考コードを読んで理解する
 2. **仕様策定**: `SPECIFICATION.md` を作成
@@ -101,7 +103,7 @@ uv pip install -e ".[dev]"
 
 ### テンプレートの活用
 
-`templates/` フォルダに以下のテンプレートが用意されています：
+`02_templates/` フォルダに以下のテンプレートが用意されています：
 
 - `SPECIFICATION.template.md` - 仕様書のテンプレート
 - `pyproject.toml.template` - プロジェクト設定のテンプレート
@@ -110,28 +112,28 @@ uv pip install -e ".[dev]"
 - `test_e2e.template.py` - E2Eテストのテンプレート
 
 ### 進捗を記録する
-`progress/learning_log.md` に学習内容や気づきを記録
+`05_progress/learning_log.md` に学習内容や気づきを記録
 
 ### 学習ノートを取る
-`notes/` 配下に章ごとのノートやメモを作成
+`04_notes/` 配下に章ごとのノートやメモを作成
 
 ### 参考コードを確認する
-`reference/` 配下の元のリポジトリを参照
+`01_reference/` 配下の元のリポジトリを参照
 
 ## 📚 重要なドキュメント
 
 - **[.claude/claude.md](./.claude/claude.md)** - プロジェクトルールとベストプラクティス（必読）
-- **[progress/learning_log.md](./progress/learning_log.md)** - 学習進捗と詳細記録
-- **[notes/](./notes/)** - 学習ガイド・技術ノート
-  - [テストコード作成ガイド](./notes/test_writing_guide.md)
-  - [uvパッケージマネージャーガイド](./notes/uv_package_manager_guide.md)
-  - [Git & GitHub 初心者ガイド](./notes/git_github_beginner_guide.md)
-  - [MCP設定完全ガイド](./notes/mcp_setup_guide.md)
+- **[05_progress/learning_log.md](./05_progress/learning_log.md)** - 学習進捗と詳細記録
+- **[04_notes/](./04_notes/)** - 学習ガイド・技術ノート
+  - [テストコード作成ガイド](./04_notes/test_writing_guide.md)
+  - [uvパッケージマネージャーガイド](./04_notes/uv_package_manager_guide.md)
+  - [Git & GitHub 初心者ガイド](./04_notes/git_github_beginner_guide.md)
+  - [MCP設定完全ガイド](./04_notes/mcp_setup_guide.md)
 
 ## 📝 プロジェクト情報
 
 - **開始日**: 2025-11-03
-- **進捗状況**: [progress/learning_log.md](./progress/learning_log.md) を参照
+- **進捗状況**: [05_progress/learning_log.md](./05_progress/learning_log.md) を参照
 - **完了パターン数**: 3 / 26 パターン
 - **完了パターン**:
   - Model DB (Chapter 2) - 2025-11-04

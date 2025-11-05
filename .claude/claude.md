@@ -22,20 +22,22 @@
 
 ```
 .
-├── reference/              # 参考リポジトリ（読み取り専用）
-├── my_implementations/     # 自分で実装するコード（書き込み可）
-├── notes/                  # 学習ノート・メモ（書き込み可）
-└── progress/               # 進捗管理（書き込み可）
+├── 01_reference/           # 参考リポジトリ（読み取り専用）
+├── 02_templates/           # テンプレートファイル
+├── 03_my_implementations/  # 自分で実装するコード（書き込み可）
+├── 04_notes/               # 学習ノート・メモ（書き込み可）
+├── 05_progress/            # 進捗管理（書き込み可）
+└── 06_docs/                # ドキュメント
 ```
 
 ### 重要なルール
 
-1. **`reference/` は読み取り専用**
+1. **`01_reference/` は読み取り専用**
    - 参考リポジトリのコードは変更しない
    - 分析や理解のためにのみ参照する
-   - 必要に応じてコピーして `my_implementations/` で改変
+   - 必要に応じてコピーして `03_my_implementations/` で改変
 
-2. **`my_implementations/` に実装する**
+2. **`03_my_implementations/` に実装する**
    - ゼロから実装したコードはここに配置
    - パターンごとにサブディレクトリを作成
    - **ディレクトリ命名規則**: `{NN}_{pattern_name}/` (例: `01_model_db/`, `02_iris_sklearn_svc/`)
@@ -45,12 +47,12 @@
      - ❌ Pythonファイル: `01_data_loader.py`（数字で始まるとimportできない）
      - ✅ Pythonファイル: `data_loader.py`, `model.py`, `trainer.py`
 
-3. **`notes/` に学習メモを記録**
+3. **`04_notes/` に学習メモを記録**
    - パターンごとの理解をまとめる
    - アーキテクチャ図や設計メモを保存
    - 命名規則: `{pattern_name}_notes.md`
 
-4. **`progress/` で進捗を管理**
+4. **`05_progress/` で進捗を管理**
    - `learning_log.md` は**進捗の把握のみに使用**
      - どこまで完了したか（チェックリスト）
      - 次にどこから始めるか（次のタスク）
@@ -159,7 +161,7 @@ uv pip freeze > requirements.txt
    - ファイルを編集してヘッダーと分析を追加
 
 #### 4. **実装フェーズ** 💻 ← **テスト駆動開発（Green）**
-   - `my_implementations/` にゼロから実装
+   - `03_my_implementations/` にゼロから実装
    - テストを通すための最小限の実装から始める
    - 段階的に機能を拡張
    - 各ステップでテストを実行してGreenにする
@@ -573,11 +575,11 @@ pytest tests/test_{module}.py -v --cov=src --cov-report=html > tests/test_result
 
 ```bash
 # 1. ディレクトリを作成
-mkdir -p my_implementations/ch{N}__{pattern_name}
-cd my_implementations/ch{N}__{pattern_name}
+mkdir -p 03_my_implementations/chapter{N}__{category}/{NN}_{pattern_name}
+cd 03_my_implementations/chapter{N}__{category}/{NN}_{pattern_name}
 
 # 2. テンプレートからpyproject.tomlをコピー
-cp ../../templates/pyproject.toml.template pyproject.toml
+cp ../../../02_templates/pyproject.toml.template pyproject.toml
 
 # 3. Pythonバージョンを指定
 echo "3.13" > .python-version
@@ -910,7 +912,7 @@ project_root/
 - **Context7 MCP**: 最新ライブラリドキュメントの参照
 - **PostgreSQL MCP**: データベース操作
 
-詳細な設定方法は `notes/mcp_setup_guide.md` を参照してください。
+詳細な設定方法は `04_notes/mcp_setup_guide.md` を参照してください。
 
 ---
 
@@ -935,7 +937,7 @@ project_root/
 #### 管理方針
 
 - **セッション終了時**: 一時ファイルを削除または整理
-- **永続的な情報**: `notes/` または `progress/` に統合
+- **永続的な情報**: `04_notes/` または `05_progress/` に統合
 - **.gitignore**: 一時ファイルのパターンを追加
 
 ```gitignore
@@ -1128,7 +1130,7 @@ GitHubは自動的にトークンやシークレットの検出を行います�
 - 一時ファイル管理ルールを追加
 - 個人情報とセキュリティルールを追加
 - Git push前の確認ルールを追加
-- MCP設定の詳細は notes/mcp_setup_guide.md に分離
+- MCP設定の詳細は 04_notes/mcp_setup_guide.md に分離
 - **命名規則を更新**:
   - ディレクトリに連番接頭辞（01_, 02_, 03_...）でフロー順に整理
   - Pythonファイル名には連番を付けない（importエラーを回避）
