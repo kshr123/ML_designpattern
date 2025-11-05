@@ -401,6 +401,86 @@ uv pip freeze > requirements.txt
 - **データ**: サンプルデータはgitにコミットせず、ダウンロードスクリプトを用意
 - **評価**: 学習と推論のメトリクスを明確に記録
 
+### データセットファイルの管理（重要）⚠️
+
+**大容量データはGitにプッシュしない**
+
+GitHubの制限（100MB）を超えるファイルはプッシュできません。以下のルールを厳守してください。
+
+#### 禁止事項
+
+❌ **以下のファイルをGitにコミット・プッシュしない**:
+- データセットの圧縮ファイル（*.tar.gz, *.zip, *.tar, *.7z, *.rar）
+- 大容量データセット（CIFAR-10, ImageNet, MNIST等）
+- 展開済みのデータセットディレクトリ
+
+#### 推奨方法
+
+✅ **データセットの正しい管理方法**:
+
+1. **ダウンロードスクリプトを作成**
+   ```python
+   # download_data.py
+   import urllib.request
+   import tarfile
+
+   def download_cifar10():
+       """CIFAR-10データセットをダウンロードして展開する"""
+       url = "https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz"
+       filename = "cifar-10-python.tar.gz"
+
+       print("Downloading CIFAR-10...")
+       urllib.request.urlretrieve(url, filename)
+
+       print("Extracting...")
+       with tarfile.open(filename, "r:gz") as tar:
+           tar.extractall()
+
+       print("Done!")
+
+   if __name__ == "__main__":
+       download_cifar10()
+   ```
+
+2. **README.mdに記載**
+   ```markdown
+   ## データセットのセットアップ
+
+   CIFAR-10データセットをダウンロードして展開します：
+
+   ```bash
+   python download_data.py
+   ```
+
+   または手動でダウンロード：
+   ```bash
+   wget https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
+   tar -xzf cifar-10-python.tar.gz
+   ```
+   ```
+
+3. **.gitignoreに追加** （すでに設定済み）
+   ```gitignore
+   # Large dataset files (>100MB GitHub limit)
+   *.tar.gz
+   *.zip
+   cifar-10-batches-py/
+   test_data/
+   data/raw/
+   datasets/
+   ```
+
+#### もしプッシュしてしまったら
+
+1. **Git履歴から削除**
+   ```bash
+   git rm --cached <large-file>
+   git commit --amend --no-edit
+   git push --force
+   ```
+
+2. **.gitignoreに追加**して再発防止
+
 ### テスト結果の管理
 
 TDDサイクル（Red→Green）の証跡を残すため、テスト結果を適切に管理します。
