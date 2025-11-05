@@ -1,0 +1,142 @@
+################################################################################
+# pytest 全テスト実行結果（詳細カバレッジ付き）
+################################################################################
+#
+# 実行日時: 2025-11-06 07:52
+# 実行コマンド: pytest tests/ -v --cov=src --cov-report=term-missing
+# Python: 3.13.9
+# pytest: 8.4.2
+# pytest-cov: 7.0.0
+# プロジェクト: Model-in-Image Pattern (Chapter 3)
+#
+# このファイルの読み方は tests/test_results/README.md を参照してください
+#
+################################################################################
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter3_release_patterns/01_model_in_image/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter3_release_patterns/01_model_in_image
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+collecting ... collected 38 items
+
+tests/test_api.py::TestHealthEndpoint::test_health_check PASSED          [  2%]
+tests/test_api.py::TestHealthEndpoint::test_health_check_method_not_allowed PASSED [  5%]
+tests/test_api.py::TestMetadataEndpoint::test_metadata PASSED            [  7%]
+tests/test_api.py::TestLabelEndpoint::test_get_labels PASSED             [ 10%]
+tests/test_api.py::TestPredictTestEndpoint::test_predict_test PASSED     [ 13%]
+tests/test_api.py::TestPredictTestEndpoint::test_predict_test_label PASSED [ 15%]
+tests/test_api.py::TestPredictEndpoint::test_predict_setosa PASSED       [ 18%]
+tests/test_api.py::TestPredictEndpoint::test_predict_versicolor PASSED   [ 21%]
+tests/test_api.py::TestPredictEndpoint::test_predict_virginica PASSED    [ 23%]
+tests/test_api.py::TestPredictEndpoint::test_predict_label_setosa PASSED [ 26%]
+tests/test_api.py::TestPredictEndpoint::test_predict_label_versicolor PASSED [ 28%]
+tests/test_api.py::TestPredictEndpoint::test_predict_label_virginica PASSED [ 31%]
+tests/test_api.py::TestPredictEndpoint::test_predict_invalid_data_missing_field PASSED [ 34%]
+tests/test_api.py::TestPredictEndpoint::test_predict_invalid_data_wrong_type PASSED [ 36%]
+tests/test_api.py::TestPredictEndpoint::test_predict_invalid_data_wrong_shape PASSED [ 39%]
+tests/test_api.py::TestPredictEndpoint::test_predict_empty_data PASSED   [ 42%]
+tests/test_api.py::TestPredictEndpoint::test_predict_method_not_allowed PASSED [ 44%]
+tests/test_api.py::TestRootEndpoint::test_root_redirect_or_docs PASSED   [ 47%]
+tests/test_api.py::TestRootEndpoint::test_docs_endpoint PASSED           [ 50%]
+tests/test_api.py::TestRootEndpoint::test_openapi_json PASSED            [ 52%]
+tests/test_prediction.py::TestData::test_data_model_default PASSED       [ 55%]
+tests/test_prediction.py::TestData::test_data_model_custom PASSED        [ 57%]
+tests/test_prediction.py::TestClassifier::test_classifier_initialization PASSED [ 60%]
+tests/test_prediction.py::TestClassifier::test_load_model PASSED         [ 63%]
+tests/test_prediction.py::TestClassifier::test_load_label PASSED         [ 65%]
+tests/test_prediction.py::TestClassifier::test_predict_shape PASSED      [ 68%]
+tests/test_prediction.py::TestClassifier::test_predict_probability_range PASSED [ 71%]
+tests/test_prediction.py::TestClassifier::test_predict_setosa PASSED     [ 73%]
+tests/test_prediction.py::TestClassifier::test_predict_versicolor PASSED [ 76%]
+tests/test_prediction.py::TestClassifier::test_predict_virginica PASSED  [ 78%]
+tests/test_prediction.py::TestClassifier::test_predict_label_setosa PASSED [ 81%]
+tests/test_prediction.py::TestClassifier::test_predict_label_versicolor PASSED [ 84%]
+tests/test_prediction.py::TestClassifier::test_predict_label_virginica PASSED [ 86%]
+tests/test_prediction.py::TestClassifier::test_predict_multiple_samples PASSED [ 89%]
+tests/test_prediction.py::TestClassifier::test_predict_invalid_shape PASSED [ 92%]
+tests/test_prediction.py::TestClassifier::test_predict_invalid_type PASSED [ 94%]
+tests/test_prediction.py::TestClassifier::test_model_file_not_found PASSED [ 97%]
+tests/test_prediction.py::TestClassifier::test_label_file_not_found PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                               Stmts   Miss  Cover   Missing
+----------------------------------------------------------------
+src/model_in_image/__init__.py         0      0   100%
+src/model_in_image/app.py             88     33    62%   44-61, 113, 128, 133-135, 149, 154-156, 176, 182-183, 206, 211-219
+src/model_in_image/prediction.py      75     17    77%   85-87, 106-111, 142-145, 182-187
+----------------------------------------------------------------
+TOTAL                                163     50    69%
+Coverage HTML written to dir htmlcov
+============================== 38 passed in 0.81s ==============================
+
+
+################################################################################
+# 詳細カバレッジ分析
+################################################################################
+#
+# 【総合カバレッジ】
+# 総合: 69% (163行中113行をカバー、50行が未カバー)
+#
+# 【ファイル別カバレッジ詳細】
+#
+# 1. src/model_in_image/__init__.py: 100% ✅
+#    - 完全にカバー
+#
+# 2. src/model_in_image/app.py: 62% ⚠️
+#    - カバーされていない行: 44-61, 113, 128, 133-135, 149, 154-156, 176, 182-183, 206, 211-219
+#    - 未カバー箇所の分析:
+#      * 44-61行: startup/shutdownイベントハンドラー
+#      * 113行: エラーレスポンス処理
+#      * 128, 133-135行: 例外ハンドリング（データ検証）
+#      * 149, 154-156行: 例外ハンドリング（推論実行）
+#      * 176, 182-183行: 例外ハンドリング（確率予測）
+#      * 206, 211-219行: 例外ハンドリング（ラベル予測）
+#
+#    改善案:
+#    - startup/shutdownのテストを追加
+#    - エラーケースのテストを追加（モデル読み込み失敗、推論失敗など）
+#
+# 3. src/model_in_image/prediction.py: 77% ⚠️
+#    - カバーされていない行: 85-87, 106-111, 142-145, 182-187
+#    - 未カバー箇所の分析:
+#      * 85-87行: モデル読み込み時の例外処理
+#      * 106-111行: ラベル読み込み時の例外処理
+#      * 142-145行: 予測時の例外処理
+#      * 182-187行: ラベル変換時の例外処理
+#
+#    改善案:
+#    - 異常系テストを追加（破損したモデルファイル、JSON解析エラーなど）
+#    - エッジケースのテストを強化
+#
+# 【カバレッジ向上のための優先順位】
+#
+# 優先度: 高 🔴
+#   - startup/shutdownイベントのテスト追加
+#   - モデル/ラベルファイルの読み込み失敗テスト
+#
+# 優先度: 中 🟡
+#   - 推論実行時の例外ハンドリングテスト
+#   - データ検証エラーの追加テスト
+#
+# 優先度: 低 🟢
+#   - エッジケースの追加テスト
+#   - パフォーマンステスト
+#
+# 【総合評価】
+# ✅ 全38テストケースが成功（100%）
+# ✅ 実行時間は非常に高速（0.81秒）
+# ✅ 主要な機能（推論、API）は十分にテストされている
+# ⚠️ カバレッジは69%で目標の80%に未達
+# 📝 エラーハンドリングのテストを追加すればカバレッジ向上可能
+#
+# 【実用上の評価】
+# ✅ 本番デプロイ可能レベルの品質
+# ✅ 主要な機能は全てテスト済み
+# ✅ Kubernetesでの実デプロイメント成功
+# 📝 エラーハンドリングは実装されているが、テストが不足
+#
+################################################################################
