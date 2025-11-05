@@ -325,27 +325,129 @@ uv pip freeze > requirements.txt
 
 TDDサイクル（Red→Green）の証跡を残すため、テスト結果を適切に管理します。
 
-#### Git管理すべきディレクトリとファイル ✅
-- `test_results/` ディレクトリ - 全てのテスト結果を一元管理
-  - `{module_name}_red.txt` - 失敗時のテスト結果（Red）
-  - `{module_name}_green.txt` - 成功時のテスト結果（Green）
-  - 命名規則: モジュール名を接頭辞として使用（例: `data_loader_red.txt`, `model_green.txt`）
+#### テスト結果とコード品質チェック結果の取り扱い
+
+**重要**: テスト結果とコード品質チェック結果は **Gitで管理しません**。
 
 **理由**:
-- テキストファイルで容量が小さい（数KB）
-- Red→Greenの変化を履歴として残せる
-- diffで変化が見やすい
+- 実行環境やタイミングで結果が変わる
+- ローカル環境固有の情報を含む可能性がある
+- CI/CDで自動生成されるべき
+- 容量が大きくなる可能性がある
 
 #### Git管理しないファイル ❌
-- `htmlcov/` - HTMLカバレッジレポート（数MB、再生成可能）
+- `tests/test_results/` - テスト結果（再生成可能）
+- `quality_checks/` - コード品質チェック結果（再生成可能）
+- `htmlcov/` - HTMLカバレッジレポート（再生成可能）
 - `.pytest_cache/` - pytestキャッシュ
 - `.coverage` - カバレッジデータ（バイナリ）
+- `mlruns/` - MLflow実験データ（ローカル環境固有）
+
+#### ローカルで結果を確認する方法
+
+テスト結果やコード品質チェック結果は、各開発者がローカル環境で生成して確認します：
+
+```bash
+# テスト結果を生成
+mkdir -p tests/test_results
+pytest tests/ -v > tests/test_results/full_test_results.txt 2>&1
+
+# コード品質チェック結果を生成
+mkdir -p quality_checks
+black --check src/ tests/ > quality_checks/black_results.txt 2>&1
+ruff check src/ tests/ > quality_checks/ruff_results.txt 2>&1
+mypy src/ > quality_checks/mypy_results.txt 2>&1
+```
+
+#### README.mdは Git管理する ✅
+
+ただし、以下のREADMEファイルは**Git管理します**（結果ファイル自体は管理しない）：
+- `tests/test_results/README.md` - pytest出力の読み方ガイド
+- `quality_checks/README.md` - コード品質チェック結果の読み方ガイド
+
+**理由**:
+- 初見の人がテスト結果や品質チェック結果を理解するために必要
+- 環境に依存しない一般的な情報
+- プロジェクトのドキュメントとして価値がある
 
 #### ファイル形式の推奨事項
 
-テスト結果ファイルには、**ヘッダーと分析セクション**を含めることを推奨します：
+テスト結果ファイルには、**ヘッダーと分析セクション**を含めることを推奨します。これにより、初見の人でもpytestの出力を理解しやすくなります。
 
-**test_results_red.txt の形式**:
+**tests/test_results/README.md の形式**（必須）:
+```markdown
+# テスト結果の読み方
+
+このディレクトリにはpytestの実行結果が保存されています。
+
+## 📖 pytest出力の読み方
+
+### テスト実行結果の見方
+
+\`\`\`
+tests/test_01_data_loader.py::TestDataLoader::test_load_data_setosa PASSED [  2%]
+                              ↑                ↑                      ↑       ↑
+                           ファイル名       クラス名              テスト名  結果  進捗
+\`\`\`
+
+### 結果の種類
+
+- **PASSED** ✅ - テスト成功
+- **FAILED** ❌ - テスト失敗
+- **SKIPPED** ⏭️ - テストスキップ
+- **ERROR** 💥 - テスト実行時エラー
+
+### サマリー
+
+\`\`\`
+======================== 1 failed, 33 passed in 27.77s =========================
+                         ↑        ↑             ↑
+                      失敗数    成功数      実行時間
+\`\`\`
+
+[その他の説明...]
+```
+
+**full_test_results.txt の形式**:
+```
+################################################################################
+# pytest 全テスト実行結果
+################################################################################
+#
+# 実行日時: 2025-11-05 09:41
+# 実行コマンド: pytest tests/ -v
+# Python: 3.13.9
+# pytest: 8.4.2
+#
+# このファイルの読み方は tests/test_results/README.md を参照してください
+#
+################################################################################
+
+[pytest出力]
+
+################################################################################
+# テスト結果サマリー
+################################################################################
+#
+# 総テスト数: 34
+# 成功: 33 (97.1%)
+# 失敗: 1 (2.9%)
+# 実行時間: 27.77秒
+#
+# 【成功したテストモジュール】
+# ✅ test_01_data_loader.py    - 8/8 passed
+# ✅ test_02_model.py           - 5/5 passed
+# ...
+#
+# 【失敗したテスト】
+# ❌ test_05_mlflow_manager.py::test_log_model
+#    原因: [説明]
+#    影響: [実用上の影響]
+#
+################################################################################
+```
+
+**{module}_red.txt の形式**（TDD Red Phase）:
 ```
 ################################################################################
 # TDD Red Phase - テスト結果（失敗フェーズ）
@@ -370,7 +472,7 @@ TDDサイクル（Red→Green）の証跡を残すため、テスト結果を適
 ################################################################################
 ```
 
-**test_results_green.txt の形式**:
+**{module}_green.txt の形式**（TDD Green Phase）:
 ```
 ################################################################################
 # TDD Green Phase - テスト結果（成功フェーズ）
@@ -407,34 +509,42 @@ TDDサイクル（Red→Green）の証跡を残すため、テスト結果を適
 **ディレクトリ構造**:
 ```
 project_root/
-├── test_results/           # テスト結果を集約
-│   ├── data_loader_red.txt
-│   ├── data_loader_green.txt
-│   ├── model_red.txt
-│   ├── model_green.txt
-│   ├── trainer_red.txt
-│   ├── trainer_green.txt
-│   └── ...
 ├── tests/
+│   ├── test_results/           # テスト結果を集約（testsディレクトリ内）
+│   │   ├── README.md           # pytest出力の読み方（必須）
+│   │   ├── full_test_results.txt  # 全テスト結果
+│   │   ├── data_loader_red.txt    # TDD Red
+│   │   ├── data_loader_green.txt  # TDD Green
+│   │   └── ...
+│   ├── test_01_data_loader.py
+│   ├── test_02_model.py
+│   └── ...
 ├── src/
 └── ...
 ```
 
 **保存コマンド**:
 ```bash
-# プロジェクトルートでtest_resultsディレクトリを作成
-mkdir -p test_results
+# testsディレクトリ内にtest_resultsを作成
+mkdir -p tests/test_results
 
-# Red: テストが失敗することを確認
-pytest tests/test_{module}.py -v > test_results/{module}_red.txt 2>&1
+# README.mdを作成（pytest出力の読み方）
+# [テンプレートを使用]
+
+# 全テスト実行結果を保存（ヘッダー付き）
+pytest tests/ -v > tests/test_results/full_test_results.txt 2>&1
 # ファイルを編集してヘッダーと分析を追加
 
-# Green: テストが成功することを確認
-pytest tests/test_{module}.py -v --cov=src --cov-report=html > test_results/{module}_green.txt 2>&1
+# TDD Red: テストが失敗することを確認
+pytest tests/test_{module}.py -v > tests/test_results/{module}_red.txt 2>&1
+# ファイルを編集してヘッダーと分析を追加
+
+# TDD Green: テストが成功することを確認
+pytest tests/test_{module}.py -v --cov=src --cov-report=html > tests/test_results/{module}_green.txt 2>&1
 # ファイルを編集してヘッダーと分析を追加
 ```
 
-この形式により、後から見返したときにTDDのプロセスを理解しやすくなります。
+この形式により、後から見返したときにTDDのプロセスを理解しやすくなり、初見の人でもpytestの出力を読めるようになります。
 
 ---
 
@@ -539,18 +649,77 @@ pytest tests/ -v --cov=src
 
 #### Step 6: コード品質チェック
 
+コード品質チェックを実行し、結果を保存します。
+
 ```bash
-# フォーマット
-black src/ tests/
+# 品質チェック用ディレクトリを作成
+mkdir -p quality_checks
 
-# リント
-ruff check src/ tests/
+# Black（コードフォーマット）
+black --check src/ tests/ > quality_checks/black_results.txt 2>&1
+# ファイルを編集してヘッダーと分析を追加
 
-# 型チェック
-mypy src/
+# Ruff（リント）
+ruff check src/ tests/ > quality_checks/ruff_results.txt 2>&1
+# ファイルを編集してヘッダーと分析を追加
+
+# Mypy（型チェック）
+mypy src/ > quality_checks/mypy_results.txt 2>&1
+# ファイルを編集してヘッダーと分析を追加
 
 # テスト実行（カバレッジ付き）
 pytest tests/ -v --cov=src --cov-report=html
+```
+
+**コード品質チェック結果の管理**:
+
+結果ファイルには**ヘッダーと分析セクション**を含めること：
+
+```
+################################################################################
+# Black コードフォーマットチェック結果
+################################################################################
+#
+# 実行日時: 2025-11-05
+# 実行コマンド: black --check src/ tests/
+# Black バージョン: 24.10.0
+#
+# このファイルの読み方は quality_checks/README.md を参照してください
+#
+################################################################################
+
+[ツールの出力]
+
+################################################################################
+# 結果サマリー
+################################################################################
+#
+# ステータス: ✅ PASS
+# チェック対象: Nファイル
+# 問題のあるファイル: 0ファイル
+#
+# 【評価】
+# ✅ すべてのファイルが規約に準拠しています
+# ...
+#
+################################################################################
+```
+
+**quality_checks/README.md** を作成して、各ツールの出力の読み方を説明すること：
+- Black: フォーマットチェック結果の読み方
+- Ruff: リント結果とエラーの種類
+- Mypy: 型エラーと警告の読み方（外部ライブラリのスタブ不足は許容）
+
+**ディレクトリ構造**:
+```
+project_root/
+├── quality_checks/           # コード品質チェック結果
+│   ├── README.md             # 各ツールの出力の読み方（必須）
+│   ├── black_results.txt     # Blackの結果
+│   ├── ruff_results.txt      # Ruffの結果
+│   └── mypy_results.txt      # Mypyの結果
+├── src/
+└── tests/
 ```
 
 #### Step 7: ドキュメント作成と記録
