@@ -148,6 +148,57 @@
 
 ---
 
+### 7. [One-Class SVMと外れ値検出手法](./07_one_class_svm_and_anomaly_detection.md)
+**対象**: 異常検知を学びたい人、教師なし学習を理解したい人
+
+#### 📝 内容
+- One-Class SVMの基本概念（正常データのみから学習）
+- 決定境界の学習とカーネルトリック
+- nuパラメータによる外れ値率の制御
+- 他の外れ値検出手法（Isolation Forest、Local Outlier Factor、DBSCAN）
+- 手法選択ガイド（データサイズ、次元数、目的別）
+- 実装例とユースケース（不正検知、異常検知、品質管理）
+
+#### 🎯 こんな時に読む
+- 「異常検知ってどうやるの？」
+- 「正常データしかない場合は？」
+- 「One-Class SVMって何？」
+- 「外れ値検出手法の違いがわからない」
+- 「不正検知システムを作りたい」
+
+#### ⏱️ 読了時間
+約30分
+
+---
+
+### 8. [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) ⭐ NEW!
+**対象**: PyTorchを初めて使う人、深層学習で画像分類に挑戦したい人
+
+#### 📝 内容
+- PyTorchとは何か（特徴、他フレームワークとの比較）
+- 画像分類の基礎（CIFAR-10データセット）
+- CNN（畳み込みニューラルネットワーク）の仕組み
+  - 畳み込み層、活性化関数、プーリング層、全結合層の詳細解説
+  - SimpleCNNアーキテクチャの全体像
+- PyTorchの基本概念（Tensor、nn.Module、DataLoader、損失関数、最適化、デバイス管理）
+- 実践: CIFAR-10画像分類（完全なコード付き5ステップ）
+- よくある質問とトラブルシューティング（7つのQ&A）
+- 次のステップ（4レベル別の学習パス、プロジェクトアイデア）
+
+#### 🎯 こんな時に読む
+- 「PyTorchって何？」
+- 「深層学習で画像分類をしたい」
+- 「CNNの仕組みを知りたい」
+- 「どうやって学習ループを書くの？」
+- 「ハイパーパラメータの調整方法は？」
+- 「精度が上がらない」
+- 「メモリ不足エラーが出る」
+
+#### ⏱️ 読了時間
+約70分
+
+---
+
 ## 🎓 学習の進め方
 
 ### 初心者向けの推奨順序
@@ -171,7 +222,13 @@
 6. ONNX推論パターン完全ガイド
    ↓ (モデルデプロイ)
 
-7. 実際のプロジェクトに適用
+7. One-Class SVMと外れ値検出手法
+   ↓ (異常検知)
+
+8. PyTorch画像分類 完全ガイド
+   ↓ (深層学習)
+
+9. 実際のプロジェクトに適用
 ```
 
 ### シナリオ別ガイド
@@ -204,6 +261,9 @@
 | MCPが動かない | [MCP設定完全ガイド](./03_mcp_setup_guide.md) |
 | GitHub Actionsが失敗 | [GitHub Actions 完全ガイド](./05_github_actions_guide.md) |
 | モデルデプロイ方法がわからない | [ONNX推論パターン完全ガイド](./06_onnx_inference_patterns.md) |
+| 異常検知の手法がわからない | [One-Class SVMと外れ値検出手法](./07_one_class_svm_and_anomaly_detection.md) |
+| PyTorchの使い方がわからない | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
+| CNNの仕組みを知りたい | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
 
 ---
 
@@ -217,6 +277,8 @@
 | **テストコード作成ガイド** | 初級〜中級 | ⭐⭐⭐ | 約150行 |
 | **GitHub Actions 完全ガイド** ⭐ | 中級 | ⭐⭐⭐ | 約873行 |
 | **ONNX推論パターン完全ガイド** ⭐ | 中級〜上級 | ⭐⭐⭐ | 約1400行 |
+| **One-Class SVMと外れ値検出手法** | 中級 | ⭐⭐⭐ | 約600行 |
+| **PyTorch画像分類 完全ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約1100行 |
 
 ---
 
@@ -232,6 +294,8 @@
 4. **テストコード作成ガイド** - 品質保証のため
 5. **GitHub Actions 完全ガイド** - CI/CD自動化のため
 6. **ONNX推論パターン完全ガイド** - モデルデプロイ時に
+7. **One-Class SVMと外れ値検出手法** - 異常検知を実装する時に
+8. **PyTorch画像分類 完全ガイド** - 深層学習で画像分類をする時に
 
 ### Q2: 全部読まないとダメ？
 
@@ -246,6 +310,8 @@
 - **MCP設定完全ガイド**: 各MCPの使用例
 - **GitHub Actions 完全ガイド**: iris_sklearn_svcの実際のワークフロー
 - **ONNX推論パターン完全ガイド**: 7つのパターンの完全な実装例
+- **One-Class SVMと外れ値検出手法**: iris_sklearn_outlierの実装例
+- **PyTorch画像分類 完全ガイド**: CIFAR-10の完全な実装（5ステップ）
 
 ### Q4: このプロジェクト以外でも使える？
 
@@ -260,6 +326,10 @@
 - 学習を通じて得た知見を追加
 
 ### 更新履歴
+- **2025-11-05**:
+  - One-Class SVMと外れ値検出手法を追加
+  - PyTorch画像分類 完全ガイドを追加 ⭐
+  - ガイドに連番を付与するルールを明確化
 - **2025-11-04 (夜)**:
   - GitHub Actions 完全ガイドを追加 ⭐
   - ONNX推論パターン完全ガイドを追加 ⭐
@@ -285,14 +355,16 @@
 ## 📂 ディレクトリ構造
 
 ```
-notes/
-├── README.md                            # このファイル（ガイドのインデックス）
-├── 01_uv_package_manager_guide.md       # uvパッケージマネージャーガイド
-├── 02_git_github_beginner_guide.md      # Git & GitHub 初心者ガイド
-├── 03_mcp_setup_guide.md                # MCP設定完全ガイド
-├── 04_test_writing_guide.md             # テストコード作成ガイド
-├── 05_github_actions_guide.md           # GitHub Actions 完全ガイド ⭐
-└── 06_onnx_inference_patterns.md        # ONNX推論パターン完全ガイド ⭐
+04_notes/
+├── README.md                                    # このファイル（ガイドのインデックス）
+├── 01_uv_package_manager_guide.md               # uvパッケージマネージャーガイド
+├── 02_git_github_beginner_guide.md              # Git & GitHub 初心者ガイド
+├── 03_mcp_setup_guide.md                        # MCP設定完全ガイド
+├── 04_test_writing_guide.md                     # テストコード作成ガイド
+├── 05_github_actions_guide.md                   # GitHub Actions 完全ガイド ⭐
+├── 06_onnx_inference_patterns.md                # ONNX推論パターン完全ガイド ⭐
+├── 07_one_class_svm_and_anomaly_detection.md    # One-Class SVMと外れ値検出手法
+└── 08_pytorch_image_classification_guide.md     # PyTorch画像分類 完全ガイド ⭐
 ```
 
 ---

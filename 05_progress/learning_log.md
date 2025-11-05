@@ -10,10 +10,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 4 / 26 パターン |
-| **現在の章** | Chapter 2: Training |
-| **最新の完了** | 04_iris_sklearn_rf (2025-11-05) |
-| **次の目標** | Chapter 2 残り2パターンの完了 |
+| **完了パターン数** | 6 / 26 パターン |
+| **現在の章** | Chapter 2: Training（全パターン完了!） |
+| **最新の完了** | 06_cifar10_cnn (2025-11-05) |
+| **次の目標** | Chapter 3: Release Patterns へ進む |
 
 ---
 
@@ -28,8 +28,10 @@
   - 詳細: [03_my_implementations/chapter2_training/03_iris_binary/README.md](../03_my_implementations/chapter2_training/03_iris_binary/README.md)
 - [x] **04_iris_sklearn_rf** (完了: 2025-11-05)
   - 詳細: [03_my_implementations/chapter2_training/04_iris_sklearn_rf/README.md](../03_my_implementations/chapter2_training/04_iris_sklearn_rf/README.md)
-- [ ] cifar10
-- [ ] iris_sklearn_outlier
+- [x] **05_iris_sklearn_outlier** (完了: 2025-11-05)
+  - 詳細: [03_my_implementations/chapter2_training/05_iris_sklearn_outlier/README.md](../03_my_implementations/chapter2_training/05_iris_sklearn_outlier/README.md)
+- [x] **06_cifar10_cnn** (完了: 2025-11-05)
+  - 詳細: [03_my_implementations/chapter2_training/06_cifar10_cnn/README.md](../03_my_implementations/chapter2_training/06_cifar10_cnn/README.md)
 
 ### Chapter 3: Release Patterns（リリースパターン）
 - [ ] model_in_image_pattern
@@ -63,15 +65,28 @@
 
 ## 🎯 次のステップ
 
-### 推奨オプション
+### Chapter 2 完了！🎉
 
-**Option A: Chapter 2 を完了させる（推奨）**
-- iris_sklearn_outlier（外れ値検出）
-- cifar10（CNN画像分類）
+Chapter 2（Training）の全6パターンが完了しました。学んだことの概要：
 
-**Option B: Chapter 4 に進む**
-- ONNX + MLflow の知識を活かして推論パターンに進む
+- **01_model_db**: モデル管理データベース（FastAPI + SQLAlchemy）
+- **02_iris_sklearn_svc**: SVM + CI/CD（GitHub Actions）
+- **03_iris_binary**: 二値分類 + MLflow
+- **04_iris_sklearn_rf**: ランダムフォレスト + ONNX
+- **05_iris_sklearn_outlier**: 外れ値検出（教師なし学習）
+- **06_cifar10_cnn**: CNN画像分類（PyTorch + MLflow + ONNX）
+
+### 次の章の選択肢
+
+**Option A: Chapter 3 - Release Patterns（推奨）**
+- モデルのリリース方法を学ぶ
+- model_in_image_pattern（Dockerへのモデル組み込み）
+- model_load_pattern（実行時のモデル読み込み）
+
+**Option B: Chapter 4 - Serving Patterns**
+- 推論サービスの実装パターンを学ぶ
 - synchronous_pattern から始める
+- ONNX + MLflow の知識を活かせる
 
 ---
 

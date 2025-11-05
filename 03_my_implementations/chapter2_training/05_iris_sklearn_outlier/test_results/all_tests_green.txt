@@ -1,0 +1,63 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/05_iris_sklearn_outlier/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/05_iris_sklearn_outlier
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+collecting ... collected 35 items
+
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_returns_ndarray PASSED [  2%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_shape PASSED [  5%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_dtype PASSED [  8%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_no_nan PASSED [ 11%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_positive_values PASSED [ 14%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_consistency PASSED [ 17%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_returns_pipeline PASSED [ 20%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_has_correct_steps PASSED [ 22%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_scaler_type PASSED [ 25%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_ocs_type PASSED [ 28%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_default_parameters PASSED [ 31%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_custom_nu PASSED [ 34%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_custom_gamma PASSED [ 37%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_custom_kernel PASSED [ 40%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_can_fit PASSED [ 42%]
+tests/test_model.py::TestCreateOCSPipeline::test_create_ocs_pipeline_can_predict PASSED [ 45%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_creates_file PASSED [ 48%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_file_not_empty PASSED [ 51%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_with_custom_path PASSED [ 54%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_requires_fitted_model PASSED [ 57%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_predictions_match PASSED [ 60%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_with_full_dataset PASSED [ 62%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_with_single_sample PASSED [ 65%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_handles_different_nu PASSED [ 68%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_returns_boolean PASSED [ 71%]
+tests/test_trainer.py::TestTrainModel::test_train_model_returns_fitted_pipeline PASSED [ 74%]
+tests/test_trainer.py::TestTrainModel::test_train_model_has_support_vectors PASSED [ 77%]
+tests/test_trainer.py::TestTrainModel::test_train_model_can_predict PASSED [ 80%]
+tests/test_trainer.py::TestTrainModel::test_train_model_decision_function PASSED [ 82%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_returns_float PASSED [ 85%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_in_valid_range PASSED [ 88%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_reasonable_outlier_rate PASSED [ 91%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_with_different_nu PASSED [ 94%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_reproducibility PASSED [ 97%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_counts_outliers PASSED [100%]
+
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                        Stmts   Miss  Cover
+---------------------------------------------------------------
+src/iris_sklearn_outlier/__init__.py            0      0   100%
+src/iris_sklearn_outlier/data_loader.py         6      0   100%
+src/iris_sklearn_outlier/model.py               8      0   100%
+src/iris_sklearn_outlier/onnx_exporter.py      18      0   100%
+src/iris_sklearn_outlier/trainer.py            10      0   100%
+tests/__init__.py                               0      0   100%
+tests/test_data_loader.py                      22      0   100%
+tests/test_model.py                            56      0   100%
+tests/test_onnx_exporter.py                    91      0   100%
+tests/test_trainer.py                          76      0   100%
+---------------------------------------------------------------
+TOTAL                                         287      0   100%
+Coverage HTML written to dir htmlcov
+============================== 35 passed in 1.65s ==============================
