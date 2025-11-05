@@ -10,10 +10,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 6 / 26 パターン |
-| **現在の章** | Chapter 2: Training（全パターン完了!） |
-| **最新の完了** | 06_cifar10_cnn (2025-11-05) |
-| **次の目標** | Chapter 3: Release Patterns へ進む |
+| **完了パターン数** | 7 / 26 パターン |
+| **現在の章** | Chapter 3: Release Patterns（進行中） |
+| **最新の完了** | 01_model_in_image (2025-11-06) |
+| **次の目標** | Chapter 3: 02_model_load_pattern の実装 |
 
 ---
 
@@ -34,8 +34,9 @@
   - 詳細: [03_my_implementations/chapter2_training/06_cifar10_cnn/README.md](../03_my_implementations/chapter2_training/06_cifar10_cnn/README.md)
 
 ### Chapter 3: Release Patterns（リリースパターン）
-- [ ] model_in_image_pattern
-- [ ] model_load_pattern
+- [x] **01_model_in_image** (完了: 2025-11-06)
+  - 詳細: [03_my_implementations/chapter3_release_patterns/01_model_in_image/README.md](../03_my_implementations/chapter3_release_patterns/01_model_in_image/README.md)
+- [ ] 02_model_load_pattern
 
 ### Chapter 4: Serving Patterns（推論パターン）
 - [ ] asynchronous_pattern
@@ -65,28 +66,41 @@
 
 ## 🎯 次のステップ
 
-### Chapter 2 完了！🎉
+### Chapter 3 開始！🚀
 
-Chapter 2（Training）の全6パターンが完了しました。学んだことの概要：
+Chapter 3（Release Patterns）の最初のパターンが完了しました。
 
-- **01_model_db**: モデル管理データベース（FastAPI + SQLAlchemy）
-- **02_iris_sklearn_svc**: SVM + CI/CD（GitHub Actions）
-- **03_iris_binary**: 二値分類 + MLflow
-- **04_iris_sklearn_rf**: ランダムフォレスト + ONNX
-- **05_iris_sklearn_outlier**: 外れ値検出（教師なし学習）
-- **06_cifar10_cnn**: CNN画像分類（PyTorch + MLflow + ONNX）
+#### 完了した内容：01_model_in_image (2025-11-06)
 
-### 次の章の選択肢
+- **学習内容**:
+  - Model-in-Image Patternの実装（モデルファイルをDockerイメージに組み込み）
+  - FastAPI + ONNX Runtime による推論API
+  - Docker & Kubernetes の基礎
+  - minikubeへの実デプロイと動作確認
 
-**Option A: Chapter 3 - Release Patterns（推奨）**
-- モデルのリリース方法を学ぶ
-- model_in_image_pattern（Dockerへのモデル組み込み）
-- model_load_pattern（実行時のモデル読み込み）
+- **技術スタック**:
+  - Python 3.13、FastAPI、ONNX Runtime
+  - Docker、Kubernetes (minikube)
+  - HPA（Horizontal Pod Autoscaler）
 
-**Option B: Chapter 4 - Serving Patterns**
-- 推論サービスの実装パターンを学ぶ
-- synchronous_pattern から始める
-- ONNX + MLflow の知識を活かせる
+- **詳細**: [01_model_in_image/README.md](../03_my_implementations/chapter3_release_patterns/01_model_in_image/README.md)
+
+#### 作成したドキュメント・チュートリアル
+
+- **学習ガイド**: [04_notes/09_docker_kubernetes_basics.md](../04_notes/09_docker_kubernetes_basics.md)
+  - Docker & Kubernetesの基礎を初心者向けに解説（850行以上）
+
+- **チュートリアルシリーズ**: [07_tutorials/](../07_tutorials/)
+  - `01_docker_basics.md` - Dockerの基礎（30分）
+  - `02_minikube_kubernetes.md` - minikube & Kubernetes（40分）
+  - `03_model_in_image_hands_on.md` - Model-in-Image Patternハンズオン（50分）
+
+### 次の目標
+
+**Chapter 3: 02_model_load_pattern**
+- モデルを外部ストレージから動的にロード
+- S3/GCSなどのオブジェクトストレージとの連携
+- Model-in-Image Patternとの違いを理解する
 
 ---
 

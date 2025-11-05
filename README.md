@@ -134,7 +134,7 @@ uv pip install -e ".[dev]"
 
 - **開始日**: 2025-11-03
 - **進捗状況**: [05_progress/learning_log.md](./05_progress/learning_log.md) を参照
-- **完了パターン数**: 6 / 26 パターン（Chapter 2 完了!）
+- **完了パターン数**: 7 / 26 パターン（Chapter 2 完了、Chapter 3 開始!）
 - **完了パターン**:
   - Model DB (Chapter 2) - 2025-11-04
   - Iris SVM Classifier + CI/CD (Chapter 2) - 2025-11-04
@@ -142,3 +142,4 @@ uv pip install -e ".[dev]"
   - Iris Random Forest + ONNX (Chapter 2) - 2025-11-05
   - Iris Outlier Detection (Chapter 2) - 2025-11-05
   - CIFAR-10 CNN + PyTorch + MLflow (Chapter 2) - 2025-11-05
+  - Model-in-Image Pattern (Chapter 3) - 2025-11-06

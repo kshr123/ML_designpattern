@@ -171,7 +171,7 @@
 
 ---
 
-### 8. [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) ⭐ NEW!
+### 8. [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) ⭐
 **対象**: PyTorchを初めて使う人、深層学習で画像分類に挑戦したい人
 
 #### 📝 内容
@@ -199,6 +199,45 @@
 
 ---
 
+### 9. [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) ⭐ NEW!
+**対象**: Docker・Kubernetes初心者、機械学習モデルをコンテナ化してデプロイしたい人
+
+#### 📝 内容
+- なぜDockerとKubernetesが必要なのか（従来の問題と解決策）
+- Dockerの基礎
+  - 重要な概念（イメージ、コンテナ、Dockerfile、レジストリ）
+  - 基本コマンド（build、run、logs、stop、rm）
+  - Dockerfileの書き方と構造
+  - Dockerの利点
+- Kubernetesの基礎
+  - 重要な概念（Pod、Deployment、Service、Namespace、HPA）
+  - 基本コマンド（apply、get、describe、logs、exec、delete）
+  - マニフェストファイル（YAML）の書き方
+- 実践: Model-in-Image Pattern
+  - プロジェクト構成
+  - Dockerイメージのビルドとテスト
+  - minikubeへのデプロイ（4ステップ）
+  - 動作確認
+- よくあるトラブルと解決方法
+  - Docker関連（ModuleNotFoundError、イメージサイズ、コンテナ終了）
+  - Kubernetes関連（ImagePullBackOff、CrashLoopBackOff、Service接続）
+- 次のステップ（学習リソース、発展的なトピック）
+
+#### 🎯 こんな時に読む
+- 「Dockerって何？」
+- 「コンテナとは？」
+- 「Kubernetesって何？」
+- 「機械学習モデルをデプロイしたい」
+- 「環境の違いで動かない問題を解決したい」
+- 「自動でスケールするシステムを作りたい」
+- 「Model-in-Imageパターンを理解したい」
+- 「ImagePullBackOffエラーが出た」
+
+#### ⏱️ 読了時間
+約60分
+
+---
+
 ## 🎓 学習の進め方
 
 ### 初心者向けの推奨順序
@@ -222,13 +261,16 @@
 6. ONNX推論パターン完全ガイド
    ↓ (モデルデプロイ)
 
-7. One-Class SVMと外れ値検出手法
+7. Docker & Kubernetes 入門ガイド ⭐ NEW!
+   ↓ (コンテナ化・オーケストレーション)
+
+8. One-Class SVMと外れ値検出手法
    ↓ (異常検知)
 
-8. PyTorch画像分類 完全ガイド
+9. PyTorch画像分類 完全ガイド
    ↓ (深層学習)
 
-9. 実際のプロジェクトに適用
+10. 実際のプロジェクトに適用
 ```
 
 ### シナリオ別ガイド
@@ -261,6 +303,10 @@
 | MCPが動かない | [MCP設定完全ガイド](./03_mcp_setup_guide.md) |
 | GitHub Actionsが失敗 | [GitHub Actions 完全ガイド](./05_github_actions_guide.md) |
 | モデルデプロイ方法がわからない | [ONNX推論パターン完全ガイド](./06_onnx_inference_patterns.md) |
+| Dockerって何？ | [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) |
+| Kubernetesが難しい | [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) |
+| ImagePullBackOffエラー | [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) |
+| コンテナ化したい | [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) |
 | 異常検知の手法がわからない | [One-Class SVMと外れ値検出手法](./07_one_class_svm_and_anomaly_detection.md) |
 | PyTorchの使い方がわからない | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
 | CNNの仕組みを知りたい | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
@@ -279,6 +325,7 @@
 | **ONNX推論パターン完全ガイド** ⭐ | 中級〜上級 | ⭐⭐⭐ | 約1400行 |
 | **One-Class SVMと外れ値検出手法** | 中級 | ⭐⭐⭐ | 約600行 |
 | **PyTorch画像分類 完全ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約1100行 |
+| **Docker & Kubernetes 入門ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約850行 |
 
 ---
 
@@ -326,6 +373,8 @@
 - 学習を通じて得た知見を追加
 
 ### 更新履歴
+- **2025-11-06**:
+  - Docker & Kubernetes 入門ガイドを追加 ⭐ NEW!
 - **2025-11-05**:
   - One-Class SVMと外れ値検出手法を追加
   - PyTorch画像分類 完全ガイドを追加 ⭐
@@ -364,7 +413,8 @@
 ├── 05_github_actions_guide.md                   # GitHub Actions 完全ガイド ⭐
 ├── 06_onnx_inference_patterns.md                # ONNX推論パターン完全ガイド ⭐
 ├── 07_one_class_svm_and_anomaly_detection.md    # One-Class SVMと外れ値検出手法
-└── 08_pytorch_image_classification_guide.md     # PyTorch画像分類 完全ガイド ⭐
+├── 08_pytorch_image_classification_guide.md     # PyTorch画像分類 完全ガイド ⭐
+└── 09_docker_kubernetes_basics.md               # Docker & Kubernetes 入門ガイド ⭐
 ```
 
 ---

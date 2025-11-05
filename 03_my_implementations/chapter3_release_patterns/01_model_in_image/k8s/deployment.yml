@@ -1,0 +1,56 @@
+# Deployment for Model-in-Image Pattern
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-in-image-deployment
+  namespace: model-in-image
+  labels:
+    app: model-in-image
+    version: v1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: model-in-image
+  template:
+    metadata:
+      labels:
+        app: model-in-image
+        version: v1.0
+    spec:
+      containers:
+      - name: model-api
+        image: model-in-image-pattern:v1.0
+        imagePullPolicy: Never  # minikubeではローカルイメージを使用
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        env:
+        - name: MODEL_FILEPATH
+          value: "/app/models/iris_svc.onnx"
+        - name: LABEL_FILEPATH
+          value: "/app/models/label.json"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

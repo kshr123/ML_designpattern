@@ -1,0 +1,8 @@
+# Namespace for Model-in-Image Pattern
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: model-in-image
+  labels:
+    name: model-in-image
+    purpose: ml-serving
