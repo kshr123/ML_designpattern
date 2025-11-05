@@ -1,0 +1,75 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.4.2, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/04_iris_sklearn_rf/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/04_iris_sklearn_rf
+configfile: pyproject.toml
+plugins: anyio-4.11.0, cov-7.0.0
+collecting ... collected 37 items
+
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_returns_correct_shape PASSED [  2%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_returns_correct_types PASSED [  5%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_has_three_classes PASSED [  8%]
+tests/test_data_loader.py::TestLoadIrisData::test_load_iris_data_feature_range PASSED [ 10%]
+tests/test_data_loader.py::TestSplitData::test_split_data_returns_correct_shapes PASSED [ 13%]
+tests/test_data_loader.py::TestSplitData::test_split_data_preserves_features PASSED [ 16%]
+tests/test_data_loader.py::TestSplitData::test_split_data_is_stratified PASSED [ 18%]
+tests/test_data_loader.py::TestSplitData::test_split_data_reproducibility PASSED [ 21%]
+tests/test_data_loader.py::TestSplitData::test_split_data_no_overlap PASSED [ 24%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_returns_pipeline PASSED [ 27%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_has_correct_steps PASSED [ 29%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_scaler_type PASSED [ 32%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_classifier_type PASSED [ 35%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_default_parameters PASSED [ 37%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_custom_parameters PASSED [ 40%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_max_depth_none PASSED [ 43%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_can_fit PASSED [ 45%]
+tests/test_model.py::TestCreateRFPipeline::test_create_rf_pipeline_can_predict PASSED [ 48%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_creates_file PASSED [ 51%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_file_not_empty PASSED [ 54%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_with_custom_path PASSED [ 56%]
+tests/test_onnx_exporter.py::TestExportToONNX::test_export_to_onnx_requires_fitted_model PASSED [ 59%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_predictions_match PASSED [ 62%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_with_full_test_set PASSED [ 64%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_with_single_sample PASSED [ 67%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_handles_different_models PASSED [ 70%]
+tests/test_onnx_exporter.py::TestValidateONNXModel::test_validate_onnx_model_returns_boolean PASSED [ 72%]
+tests/test_trainer.py::TestTrainModel::test_train_model_returns_fitted_pipeline PASSED [ 75%]
+tests/test_trainer.py::TestTrainModel::test_train_model_learns_correct_classes PASSED [ 78%]
+tests/test_trainer.py::TestTrainModel::test_train_model_can_predict PASSED [ 81%]
+tests/test_trainer.py::TestTrainModel::test_train_model_with_different_random_states PASSED [ 83%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_returns_dict PASSED [ 86%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_contains_required_metrics PASSED [ 89%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_metrics_in_valid_range PASSED [ 91%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_high_accuracy_on_iris PASSED [ 94%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_with_poor_model PASSED [ 97%]
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_reproducibility PASSED [100%]
+
+=============================== warnings summary ===============================
+tests/test_onnx_exporter.py: 100 warnings
+  /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/04_iris_sklearn_rf/.venv/lib/python3.13/site-packages/onnx/helper.py:170: DeprecationWarning: Field onnx.AttributeProto.ints: Expected an int, got a boolean. This will be rejected in 7.34.0, please fix it before that
+    node.attribute.extend(
+
+tests/test_trainer.py::TestEvaluateModel::test_evaluate_model_with_poor_model
+  /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter2_training/04_iris_sklearn_rf/.venv/lib/python3.13/site-packages/sklearn/metrics/_classification.py:1731: UndefinedMetricWarning: Precision is ill-defined and being set to 0.0 in labels with no predicted samples. Use `zero_division` parameter to control this behavior.
+    _warn_prf(average, modifier, f"{metric.capitalize()} is", result.shape[0])
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================================ tests coverage ================================
+_______________ coverage: platform darwin, python 3.13.9-final-0 _______________
+
+Name                                   Stmts   Miss  Cover
+----------------------------------------------------------
+src/iris_sklearn_rf/__init__.py            0      0   100%
+src/iris_sklearn_rf/data_loader.py        13      0   100%
+src/iris_sklearn_rf/model.py               9      0   100%
+src/iris_sklearn_rf/onnx_exporter.py      18      0   100%
+src/iris_sklearn_rf/trainer.py            11      0   100%
+tests/__init__.py                          0      0   100%
+tests/test_data_loader.py                 60      0   100%
+tests/test_model.py                       57      0   100%
+tests/test_onnx_exporter.py              100      0   100%
+tests/test_trainer.py                     90      0   100%
+----------------------------------------------------------
+TOTAL                                    358      0   100%
+Coverage HTML written to dir htmlcov
+======================= 37 passed, 101 warnings in 3.43s =======================

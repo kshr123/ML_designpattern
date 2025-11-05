@@ -10,10 +10,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 3 / 26 パターン |
+| **完了パターン数** | 4 / 26 パターン |
 | **現在の章** | Chapter 2: Training |
-| **最新の完了** | 03_iris_binary (2025-11-05) |
-| **次の目標** | Chapter 4: Serving Patterns への移行検討 |
+| **最新の完了** | 04_iris_sklearn_rf (2025-11-05) |
+| **次の目標** | Chapter 2 残り2パターンの完了 |
 
 ---
 
@@ -26,9 +26,10 @@
   - 詳細: [03_my_implementations/chapter2_training/02_iris_sklearn_svc/README.md](../03_my_implementations/chapter2_training/02_iris_sklearn_svc/README.md)
 - [x] **03_iris_binary** (完了: 2025-11-05)
   - 詳細: [03_my_implementations/chapter2_training/03_iris_binary/README.md](../03_my_implementations/chapter2_training/03_iris_binary/README.md)
+- [x] **04_iris_sklearn_rf** (完了: 2025-11-05)
+  - 詳細: [03_my_implementations/chapter2_training/04_iris_sklearn_rf/README.md](../03_my_implementations/chapter2_training/04_iris_sklearn_rf/README.md)
 - [ ] cifar10
 - [ ] iris_sklearn_outlier
-- [ ] iris_sklearn_rf
 
 ### Chapter 3: Release Patterns（リリースパターン）
 - [ ] model_in_image_pattern
@@ -64,12 +65,11 @@
 
 ### 推奨オプション
 
-**Option A: Chapter 2 を完了させる**
-- cifar10（CNN画像分類）
-- iris_sklearn_rf（ランダムフォレスト）
+**Option A: Chapter 2 を完了させる（推奨）**
 - iris_sklearn_outlier（外れ値検出）
+- cifar10（CNN画像分類）
 
-**Option B: Chapter 4 に進む（推奨）**
+**Option B: Chapter 4 に進む**
 - ONNX + MLflow の知識を活かして推論パターンに進む
 - synchronous_pattern から始める
 
