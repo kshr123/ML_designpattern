@@ -61,6 +61,22 @@ logs/
 mlruns/
 *.tfrecord
 
+# Large dataset files (>100MB GitHub limit)
+# データセットは各プロジェクトでダウンロードスクリプトを用意すること
+*.tar.gz
+*.zip
+*.tar
+*.7z
+*.rar
+cifar-10-python.tar.gz
+cifar-10-batches-py/
+mnist.pkl.gz
+imagenet/
+test_data/cifar-10-batches-py/
+data/raw/
+data/downloaded/
+datasets/
+
 # Database files
 *.sqlite
 *.sqlite3
