@@ -26,9 +26,10 @@
 
 ---
 
-### 2. [minikube & Kubernetes チュートリアル](./02_minikube_kubernetes.md)
+### 2. [minikube & Kubernetes チュートリアル](./02_minikube_kubernetes.md) ✅
 **対象**: Kubernetesを初めて使う人
 **所要時間**: 約40分
+**ステータス**: 実施済み（2025-11-07）- [実施記録](./k8s-tutorial/SESSION_LOG.md)
 
 #### 学べること
 - minikubeのセットアップ
@@ -38,13 +39,14 @@
 - デプロイとスケーリング
 
 #### 実施内容
-1. minikube起動と確認
-2. 最初のPodをデプロイ
-3. Deploymentでレプリカを管理
-4. Serviceで公開
-5. スケールアウト/イン
-6. ローリングアップデート
-7. クリーンアップ
+1. ✅ minikube起動と確認
+2. ✅ kubectl基本コマンド
+3. ✅ Deploymentでレプリカを管理（nginx-deployment）
+4. ✅ Serviceで公開（nginx-service）
+5. ✅ スケールアウト/イン（2個→5個→2個）
+6. ✅ ローリングアップデート（nginx:alpine → nginx:1.27）
+7. ⏸️ ロールバック（未実施）
+8. ⏸️ クリーンアップ（未実施）
 
 ---
 

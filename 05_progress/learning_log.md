@@ -11,8 +11,9 @@
 |------|------|
 | **開始日** | 2025-11-03 |
 | **完了パターン数** | 7 / 26 パターン |
+| **完了チュートリアル数** | 2 / 3 チュートリアル |
 | **現在の章** | Chapter 3: Release Patterns（進行中） |
-| **最新の完了** | 01_model_in_image (2025-11-06) |
+| **最新の完了** | Kubernetes基礎チュートリアル (2025-11-07) |
 | **次の目標** | Chapter 3: 02_model_load_pattern の実装 |
 
 ---
@@ -64,6 +65,17 @@
 
 ---
 
+## 🎓 チュートリアル進捗
+
+### Docker & Kubernetes チュートリアル
+- [x] **01_docker_basics** (完了: 2025-11-06)
+  - 詳細: [07_tutorials/01_docker_basics.md](../07_tutorials/01_docker_basics.md)
+- [x] **02_minikube_kubernetes** (完了: 2025-11-07)
+  - 詳細: [07_tutorials/k8s-tutorial/SESSION_LOG.md](../07_tutorials/k8s-tutorial/SESSION_LOG.md)
+- [ ] 03_model_in_image_hands_on（実装は完了済み、ハンズオン未実施）
+
+---
+
 ## 🎯 次のステップ
 
 ### Chapter 3 開始！🚀
@@ -91,9 +103,21 @@ Chapter 3（Release Patterns）の最初のパターンが完了しました。
   - Docker & Kubernetesの基礎を初心者向けに解説（850行以上）
 
 - **チュートリアルシリーズ**: [07_tutorials/](../07_tutorials/)
-  - `01_docker_basics.md` - Dockerの基礎（30分）
-  - `02_minikube_kubernetes.md` - minikube & Kubernetes（40分）
-  - `03_model_in_image_hands_on.md` - Model-in-Image Patternハンズオン（50分）
+  - ✅ `01_docker_basics.md` - Dockerの基礎（30分）（完了: 2025-11-06）
+  - ✅ `02_minikube_kubernetes.md` - minikube & Kubernetes（40分）（完了: 2025-11-07）
+  - ⏸️ `03_model_in_image_hands_on.md` - Model-in-Image Patternハンズオン（50分）
+
+#### 最新の学習内容（2025-11-07）
+
+- **Kubernetesチュートリアル実施**:
+  - Deployment、Service、Podの関係性を理解
+  - kubectl基本コマンドの習得
+  - スケーリング（2個→5個→2個）を実践
+  - ローリングアップデート（nginx:alpine → nginx:1.27）を体験
+  - DeploymentとServiceの疎結合な設計を理解
+  - Minikubeの役割と位置づけを理解
+
+- **詳細**: [07_tutorials/k8s-tutorial/SESSION_LOG.md](../07_tutorials/k8s-tutorial/SESSION_LOG.md)
 
 ### 次の目標
 
