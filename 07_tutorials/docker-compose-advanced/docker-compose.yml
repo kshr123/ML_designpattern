@@ -1,0 +1,15 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # .envファイルから環境変数を読み込む
+      - APP_NAME=${APP_NAME}
+      - APP_VERSION=${APP_VERSION}
+      - API_KEY=${API_KEY}
+      - DATABASE_URL=${DATABASE_URL}
+      - DEBUG_MODE=${DEBUG_MODE}
+    # または、env_file を使って一括読み込み（シンプル）
+    # env_file:
+    #   - .env

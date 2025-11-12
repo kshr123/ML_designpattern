@@ -1,0 +1,19 @@
+services:
+  # FastAPIアプリケーション
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    volumes:
+      - ./app.py:/app/app.py  # 開発時のホットリロード用
+    command: uvicorn app:app --host 0.0.0.0 --port 8000 --reload  # 自動リロード有効化
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"

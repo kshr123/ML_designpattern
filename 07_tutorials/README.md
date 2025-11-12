@@ -29,7 +29,7 @@
 ### 2. [minikube & Kubernetes チュートリアル](./02_minikube_kubernetes.md) ✅
 **対象**: Kubernetesを初めて使う人
 **所要時間**: 約40分
-**ステータス**: 実施済み（2025-11-07）- [実施記録](./k8s-tutorial/SESSION_LOG.md)
+**ステータス**: 完了（2025-11-07、クリーンアップ: 2025-11-12）- [実施記録](./k8s-tutorial/SESSION_LOG.md)
 
 #### 学べること
 - minikubeのセットアップ
@@ -45,8 +45,33 @@
 4. ✅ Serviceで公開（nginx-service）
 5. ✅ スケールアウト/イン（2個→5個→2個）
 6. ✅ ローリングアップデート（nginx:alpine → nginx:1.27）
-7. ⏸️ ロールバック（未実施）
-8. ⏸️ クリーンアップ（未実施）
+7. ✅ クリーンアップ（2025-11-12）
+
+---
+
+### 番外編: Docker Compose チュートリアル 🐳
+**対象**: 複数コンテナの連携を学びたい人
+**所要時間**: 約60分
+**ステータス**: 実施済み（2025-11-06）
+
+#### 学べること
+- Docker Composeの基本
+- 複数コンテナの連携（FastAPI + Redis）
+- 環境変数の管理（.env、.env.example）
+- ボリュームマウント
+- サービス間通信
+
+#### 実施内容
+1. ✅ Docker Composeデモ（docker-compose-demo/）
+   - FastAPI + Redis構成
+   - アクセスカウンター機能
+2. ✅ Docker Compose高度な使い方（docker-compose-advanced/）
+   - 環境変数管理
+   - フロー図作成
+
+#### 学習記録
+- [docker_learning_notes.md](./docker_learning_notes.md) - Docker学習メモ
+- [docker_tutorial_session_log.md](./docker_tutorial_session_log.md) - セッションログ
 
 ---
 
