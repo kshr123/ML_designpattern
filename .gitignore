@@ -114,9 +114,12 @@ RESTART_*.md
 htmlcov/
 .tox/
 
-# テスト結果ファイルは保存する（除外しない）
-# test_results_red.txt
-# test_results_green.txt
+# テスト結果とコード品質チェック結果（再生成可能なため除外）
+# ただし、README.mdは読み方ガイドとして管理する
+**/tests/test_results/*.txt
+**/quality_checks/*.txt
+!**/tests/test_results/README.md
+!**/quality_checks/README.md
 
 # OS
 Thumbs.db
