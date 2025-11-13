@@ -1,0 +1,154 @@
+# ==============================================================================
+# Deployment定義 - Model-Load Pattern
+# ==============================================================================
+# Model-Load Patternの核心部分
+#
+# 【このパターンの特徴】
+#   1. InitContainer: Pod起動時にモデルをGCSからダウンロード
+#   2. emptyDir: InitContainerとMain Containerでモデルファイルを共有
+#   3. Main Container: ダウンロードしたモデルを使ってFastAPIで推論サービスを提供
+#
+# 【Model-in-Imageパターンとの違い】
+#   - Model-in-Image: モデルをDockerイメージに焼き込む（シンプル、速い起動）
+#   - Model-Load: モデルを外部から読み込む（柔軟、小さいイメージサイズ）
+# ==============================================================================
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: model-load-pattern
+  namespace: model-load-pattern  # このDeploymentが属する名前空間
+  labels:
+    app: model-load-pattern
+
+spec:
+  # ------------------------------------------------------------------------------
+  # レプリカ数（Pod数）
+  # ------------------------------------------------------------------------------
+  replicas: 2  # 2つのPodを起動（負荷分散と冗長性）
+
+  # ------------------------------------------------------------------------------
+  # セレクタ（どのPodを管理するか）
+  # ------------------------------------------------------------------------------
+  selector:
+    matchLabels:
+      app: model-load-pattern  # このラベルを持つPodを管理
+
+  # ------------------------------------------------------------------------------
+  # Pod Template（Podの設計図）
+  # ------------------------------------------------------------------------------
+  template:
+    metadata:
+      labels:
+        app: model-load-pattern  # Podに付けるラベル（Serviceがこれで識別）
+
+    spec:
+      # ============================================================================
+      # InitContainer: Pod起動前に実行されるコンテナ
+      # ============================================================================
+      # 役割: GCSからモデルファイルをダウンロードしてemptyDirに保存
+      # 実行順序: InitContainer → Main Container
+      # ============================================================================
+      initContainers:
+        - name: model-loader
+          image: model-load-pattern-loader:latest
+          imagePullPolicy: Never  # minikube用（ローカルイメージを使用）
+
+          # 環境変数（GCSのバケットとファイルパスを指定）
+          env:
+            - name: GCS_BUCKET
+              value: "ml_system_model_repository"  # GCSバケット名
+            - name: GCS_MODEL_BLOB
+              value: "iris_svc.onnx"  # GCS上のモデルファイルパス
+            - name: MODEL_FILEPATH
+              value: "/workdir/models/iris_svc.onnx"  # ダウンロード先パス
+
+          # ボリュームマウント（emptyDirをマウント）
+          volumeMounts:
+            - name: model-storage  # volumes で定義した名前
+              mountPath: /workdir/models  # コンテナ内のマウント先
+
+      # ============================================================================
+      # Main Container: アプリケーション本体
+      # ============================================================================
+      # 役割: InitContainerがダウンロードしたモデルを使ってFastAPIを起動
+      # ============================================================================
+      containers:
+        - name: api
+          image: model-load-pattern-api:latest
+          imagePullPolicy: Never  # minikube用（ローカルイメージを使用）
+
+          # コンテナが公開するポート
+          ports:
+            - containerPort: 8000
+              name: http
+
+          # 環境変数（モデルとラベルのファイルパスを指定）
+          env:
+            - name: MODEL_FILEPATH
+              value: "/workdir/models/iris_svc.onnx"  # InitContainerがダウンロードしたモデル
+            - name: LABEL_FILEPATH
+              value: "/workdir/config/label.json"  # Dockerイメージに含まれるラベルファイル（emptyDirと競合しないよう別ディレクトリ）
+
+          # ボリュームマウント（InitContainerと同じemptyDirをマウント）
+          volumeMounts:
+            - name: model-storage  # InitContainerと同じボリューム
+              mountPath: /workdir/models  # 同じパスにマウント
+
+          # --------------------------------------------------------------------------
+          # リソース制限（CPU・メモリ）
+          # --------------------------------------------------------------------------
+          resources:
+            limits:
+              cpu: 500m        # 最大CPU使用量（0.5コア）
+              memory: 512Mi    # 最大メモリ使用量（512MiB）
+            requests:
+              cpu: 250m        # 最小確保するCPU（0.25コア）
+              memory: 256Mi    # 最小確保するメモリ（256MiB）
+
+          # --------------------------------------------------------------------------
+          # Liveness Probe（生存確認）
+          # --------------------------------------------------------------------------
+          # コンテナが正常に動作しているかチェック
+          # 失敗するとコンテナを再起動
+          # --------------------------------------------------------------------------
+          livenessProbe:
+            httpGet:
+              path: /health      # ヘルスチェックエンドポイント
+              port: 8000
+            initialDelaySeconds: 30  # 起動後30秒待ってからチェック開始
+            periodSeconds: 10        # 10秒ごとにチェック
+            timeoutSeconds: 5        # 5秒以内に応答がなければ失敗
+
+          # --------------------------------------------------------------------------
+          # Readiness Probe（準備完了確認）
+          # --------------------------------------------------------------------------
+          # コンテナがトラフィックを受け付ける準備ができているかチェック
+          # 失敗するとServiceのエンドポイントから除外
+          # --------------------------------------------------------------------------
+          readinessProbe:
+            httpGet:
+              path: /health      # ヘルスチェックエンドポイント
+              port: 8000
+            initialDelaySeconds: 10  # 起動後10秒待ってからチェック開始
+            periodSeconds: 5         # 5秒ごとにチェック
+            timeoutSeconds: 3        # 3秒以内に応答がなければ失敗
+
+      # ============================================================================
+      # Volumes（ボリューム定義）
+      # ============================================================================
+      # emptyDir: Pod内のコンテナ間でデータを共有するための一時ストレージ
+      #
+      # 特徴:
+      #   - Pod起動時に作成され、Pod削除時に消える
+      #   - 同じPod内のすべてのコンテナからアクセス可能
+      #   - InitContainerとMain Containerでモデルファイルを共有するために使用
+      #
+      # データの流れ:
+      #   1. InitContainer が emptyDir にモデルをダウンロード
+      #   2. InitContainer 終了
+      #   3. Main Container が emptyDir からモデルを読み込み
+      # ============================================================================
+      volumes:
+        - name: model-storage  # ボリューム名（volumeMountsで参照）
+          emptyDir: {}         # 空のディレクトリを作成
