@@ -11,9 +11,9 @@
 |------|------|
 | **開始日** | 2025-11-03 |
 | **完了パターン数** | 7 / 26 パターン |
-| **完了チュートリアル数** | 3 / 3 チュートリアル（すべて完了！） |
+| **完了チュートリアル数** | 4 / 4 チュートリアル（すべて完了！） |
 | **現在の章** | Chapter 3: Release Patterns（進行中） |
-| **最新の完了** | Docker/K8sチュートリアル整理・コミット (2025-11-12) |
+| **最新の完了** | Model-in-Image Pattern ハンズオン (2025-11-13) |
 | **次の目標** | Chapter 3: 02_model_load_pattern の実装 |
 
 ---
@@ -76,7 +76,8 @@
   - docker-compose-demo/: FastAPI + Redis構成
   - docker-compose-advanced/: 環境変数管理
   - 詳細: [07_tutorials/docker_learning_notes.md](../07_tutorials/docker_learning_notes.md)
-- [ ] 03_model_in_image_hands_on（実装は完了済み、ハンズオン未実施）
+- [x] **03_model_in_image_hands_on** (完了: 2025-11-13)
+  - 詳細: [07_tutorials/TUTORIAL_PROGRESS.md](../07_tutorials/TUTORIAL_PROGRESS.md)
 
 ---
 
