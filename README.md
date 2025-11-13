@@ -147,3 +147,4 @@ uv pip install -e ".[dev]"
   - Web Single Pattern (Chapter 4) - 2025-11-13
   - Synchronous Pattern (Chapter 4) - 2025-11-13
   - Asynchronous Pattern (Chapter 4) - 2025-11-13
+  - Batch Pattern (Chapter 4) - 2025-11-13

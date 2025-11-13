@@ -1,0 +1,88 @@
+services:
+  # 本番用MySQLデータベース
+  mysql:
+    image: mysql:8.0
+    container_name: batch_pattern_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: sample_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # テスト用MySQLデータベース
+  mysql_test:
+    image: mysql:8.0
+    container_name: batch_pattern_mysql_test
+    environment:
+      MYSQL_ROOT_PASSWORD: test_password
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+    ports:
+      - "3307:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptest_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # APIサービス
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: batch-pattern:latest
+    container_name: batch_pattern_api
+    ports:
+      - "8000:8000"
+    environment:
+      PLATFORM: docker
+      MYSQL_SERVER: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+      MYSQL_DATABASE: sample_db
+      MODEL_FILEPATH: models/iris_svc.onnx
+      LABEL_FILEPATH: models/label.json
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # バッチジョブサービス
+  job:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: batch-pattern:latest
+    container_name: batch_pattern_job
+    command: python -m src.task.job
+    environment:
+      PLATFORM: docker
+      MYSQL_SERVER: mysql
+      MYSQL_PORT: 3306
+      MYSQL_USER: user
+      MYSQL_PASSWORD: userpassword
+      MYSQL_DATABASE: sample_db
+      MODEL_FILEPATH: models/iris_svc.onnx
+      LABEL_FILEPATH: models/label.json
+      BATCH_WAIT_TIME: 60
+      WORKER_THREADS: 4
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

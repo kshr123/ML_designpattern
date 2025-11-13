@@ -10,11 +10,11 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 10 / 26 パターン |
+| **完了パターン数** | 11 / 26 パターン |
 | **完了チュートリアル数** | 4 / 4 チュートリアル（すべて完了！） |
 | **現在の章** | Chapter 4: Serving Patterns（進行中） |
-| **最新の完了** | Synchronous Pattern (2025-11-13) |
-| **次の目標** | Chapter 4: Asynchronous Pattern へ進む |
+| **最新の完了** | Batch Pattern (2025-11-13) |
+| **次の目標** | Chapter 4: 他のServing Patternsへ進む |
 
 ---
 
@@ -41,16 +41,20 @@
   - 詳細: [03_my_implementations/chapter3_release_patterns/02_model_load_pattern/README.md](../03_my_implementations/chapter3_release_patterns/02_model_load_pattern/README.md)
 
 ### Chapter 4: Serving Patterns（推論パターン）
-- [ ] asynchronous_pattern
-- [ ] batch_pattern
+- [x] **01_web_single_pattern** (完了: 2025-11-13)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/01_web_single_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/01_web_single_pattern/README.md)
+- [x] **02_synchronous_pattern** (完了: 2025-11-13)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/02_synchronous_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/02_synchronous_pattern/README.md)
+- [x] **03_asynchronous_pattern** (完了: 2025-11-13)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/03_asynchronous_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/03_asynchronous_pattern/README.md)
+- [x] **04_batch_pattern** (完了: 2025-11-13)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/04_batch_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/04_batch_pattern/README.md)
 - [ ] data_cache_pattern
 - [ ] edge_ai_pattern
 - [ ] horizontal_microservice_pattern
 - [ ] prediction_cache_pattern
 - [ ] prep_pred_pattern
 - [ ] sync_async_pattern
-- [ ] synchronous_pattern
-- [ ] web_single_pattern
 
 ### Chapter 5: Operations（運用）
 - [ ] prediction_log_pattern
@@ -187,6 +191,30 @@ Chapter 3（Release Patterns）の最初のパターンが完了しました。
 
 - **詳細**: [03_asynchronous_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/03_asynchronous_pattern/README.md)
 
+### 完了した内容：04_batch_pattern ✅ (2025-11-13)
+
+- **学習内容**:
+  - Batch Patternの実装（データ登録と推論処理を時間的に分離）
+  - ThreadPoolExecutorによる並列バッチ推論
+  - MySQL 8.0との連携
+  - Docker Composeによる3サービス構成（mysql、api、job）
+
+- **技術スタック**:
+  - Python 3.13、FastAPI、ONNX Runtime
+  - SQLAlchemy 2.0、PyMySQL、cryptography
+  - Docker、Docker Compose
+  - ThreadPoolExecutor（4 workers）
+
+- **学んだポイント**:
+  - **仕様駆動開発の重要性**: 仕様（MySQL）と実装（SQLite）の不一致に気づき、修正
+  - MySQL 8.0の認証方式（caching_sha2_password）とcryptographyパッケージの必要性
+  - SQLAlchemy 2.0への移行（encodingパラメータ廃止）
+  - テスト環境と本番環境の一致（SQLite→MySQL）
+  - バッチ処理のベストプラクティス（並列化、適切な処理間隔、エラーハンドリング）
+  - TDDサイクルの実践（41/41テスト成功、82%カバレッジ）
+
+- **詳細**: [04_batch_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/04_batch_pattern/README.md)
+
 ### 次の目標（2025-11-13〜）
 
 **Chapter 4: Serving Patterns を継続**
@@ -195,8 +223,8 @@ Chapter 3（Release Patterns）の最初のパターンが完了しました。
 1. ✅ `web_single_pattern` - シングルWebサーバー推論（完了）
 2. ✅ `synchronous_pattern` - 同期推論（完了）
 3. ✅ `asynchronous_pattern` - 非同期推論（完了）
-4. `batch_pattern` - バッチ推論
-5. その他のパターン（Prep-Pred、Cache、Microserviceなど）
+4. ✅ `batch_pattern` - バッチ推論（完了）
+5. 次のパターン（Prep-Pred、Cache、Microserviceなど）
 
 ---
 
