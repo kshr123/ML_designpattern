@@ -1,0 +1,62 @@
+version: "3.8"
+
+services:
+  # ========================================
+  # Proxy (FastAPI)
+  # ========================================
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    container_name: async_proxy
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_NAME=predict_queue
+    depends_on:
+      - redis
+    networks:
+      - async_network
+    restart: always
+
+  # ========================================
+  # Worker (推論実行 - ONNX Runtime)
+  # ========================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: async_worker
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - QUEUE_NAME=predict_queue
+      - NUM_WORKERS=2
+      - BRPOP_TIMEOUT=1
+      - PREDICTION_TIMEOUT=10
+    depends_on:
+      - redis
+    networks:
+      - async_network
+    restart: always
+    # 複数Workerを起動する場合
+    deploy:
+      replicas: 2
+
+  # ========================================
+  # Redis (キュー + キャッシュ)
+  # ========================================
+  redis:
+    image: redis:7-alpine
+    container_name: async_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - async_network
+    restart: always
+
+networks:
+  async_network:
+    driver: bridge

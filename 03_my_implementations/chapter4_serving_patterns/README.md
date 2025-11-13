@@ -29,8 +29,8 @@
 | # | パターン名 | 内容 | 難易度 | 状態 |
 |---|-----------|------|--------|------|
 | 01 | **Web Single Pattern** | シングルコンテナでWeb API公開 | ⭐ | ✅ 完了 (2025-11-13) |
-| 02 | Synchronous Pattern | 同期推論パターン | ⭐ | ⏳ 未着手 |
-| 03 | Asynchronous Pattern | 非同期推論パターン | ⭐⭐ | ⏳ 未着手 |
+| 02 | **Synchronous Pattern** | TensorFlow Serving + gRPC/REST | ⭐⭐ | ✅ 完了 (2025-11-13) |
+| 03 | **Asynchronous Pattern** | 非同期推論パターン (Redis + ONNX) | ⭐⭐ | ✅ 完了 (2025-11-13) |
 | 04 | Batch Pattern | バッチ推論パターン | ⭐⭐ | ⏳ 未着手 |
 | 05 | Prep-Pred Pattern | 前処理・推論分離パターン | ⭐⭐ | ⏳ 未着手 |
 | 06 | Sync-Async Pattern | 同期・非同期ハイブリッド | ⭐⭐⭐ | ⏳ 未着手 |
@@ -73,9 +73,9 @@
 
 ## 📊 完了状況
 
-- **完了**: 1/10パターン (10%)
+- **完了**: 3/10パターン (30%)
 - **進行中**: 0/10パターン
-- **未着手**: 9/10パターン
+- **未着手**: 7/10パターン
 
 ### 完了パターン
 
@@ -88,6 +88,29 @@
   - 7つのAPIエンドポイント実装
   - gunicorn + uvicornのマルチプロセス構成を理解
 - **詳細**: [01_web_single_pattern/README.md](./01_web_single_pattern/README.md)
+
+#### 02_synchronous_pattern ✅
+- **完了日**: 2025-11-13
+- **技術スタック**: Python 3.11, TensorFlow 2.15.0, TensorFlow Serving, gRPC, Protocol Buffers
+- **成果**:
+  - TensorFlow SavedModel形式でモデル作成（精度96.67%）
+  - TensorFlow Servingでデプロイ
+  - gRPCとRESTの両方のクライアント実装
+  - Python 3.12/3.13互換性問題を解決
+  - Apple Silicon制限事項をドキュメント化
+- **詳細**: [02_synchronous_pattern/README.md](./02_synchronous_pattern/README.md)
+
+#### 03_asynchronous_pattern ✅
+- **完了日**: 2025-11-13
+- **技術スタック**: Python 3.13, FastAPI, Redis 7, ONNX Runtime, Docker Compose
+- **成果**:
+  - Proxy + Worker + Redisの3層アーキテクチャ実装
+  - TensorFlow ServingからONNX Runtimeへ移行（Apple Silicon対応）
+  - BRPOPブロッキング方式でCPU効率化（ポーリング vs BRPOP）
+  - 非同期処理の証明テストスクリプト作成
+  - ジョブステータス管理（pending → processing → completed）
+  - Docker Composeでマルチコンテナ構成
+- **詳細**: [03_asynchronous_pattern/README.md](./03_asynchronous_pattern/README.md)
 
 ## 🔗 関連ドキュメント
 

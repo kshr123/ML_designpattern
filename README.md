@@ -134,7 +134,7 @@ uv pip install -e ".[dev]"
 
 - **開始日**: 2025-11-03
 - **進捗状況**: [05_progress/learning_log.md](./05_progress/learning_log.md) を参照
-- **完了パターン数**: 9 / 26 パターン（Chapter 2 完了、Chapter 3 完了、Chapter 4 開始!）
+- **完了パターン数**: 11 / 26 パターン（Chapter 2 完了、Chapter 3 完了、Chapter 4 進行中）
 - **完了パターン**:
   - Model DB (Chapter 2) - 2025-11-04
   - Iris SVM Classifier + CI/CD (Chapter 2) - 2025-11-04
@@ -145,3 +145,5 @@ uv pip install -e ".[dev]"
   - Model-in-Image Pattern (Chapter 3) - 2025-11-06
   - Model-Load Pattern (Chapter 3) - 2025-11-13
   - Web Single Pattern (Chapter 4) - 2025-11-13
+  - Synchronous Pattern (Chapter 4) - 2025-11-13
+  - Asynchronous Pattern (Chapter 4) - 2025-11-13

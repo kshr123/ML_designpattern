@@ -1,0 +1,23 @@
+# =======================================================
+# Worker Dockerfile
+# =======================================================
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 依存関係のインストール
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir \
+    redis \
+    numpy \
+    onnxruntime
+
+# ONNXモデルをコピー
+COPY models/ ./models/
+
+# ソースコードをコピー
+COPY src/ ./src/
+COPY run_worker.sh ./
+
+# Worker起動
+CMD ["./run_worker.sh"]
