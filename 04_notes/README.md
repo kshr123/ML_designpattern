@@ -199,7 +199,7 @@
 
 ---
 
-### 9. [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) ⭐ NEW!
+### 9. [Docker & Kubernetes 入門ガイド](./09_docker_kubernetes_basics.md) ⭐
 **対象**: Docker・Kubernetes初心者、機械学習モデルをコンテナ化してデプロイしたい人
 
 #### 📝 内容
@@ -238,6 +238,40 @@
 
 ---
 
+### 10. [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) ⭐ NEW!
+**対象**: 画像分類モデルの選択に迷っている人、ResNetを使いたい人
+
+#### 📝 内容
+- ResNetとは何か（残差接続、深いネットワークの学習）
+- ResNetの特徴とバリエーション（ResNet-18/34/50/101/152）
+- ResNet50の使い方
+  - ONNXモデルのダウンロード
+  - ImageNet標準の前処理（リサイズ、正規化、チャンネル順序変換）
+  - ONNX Runtimeでの推論
+  - 後処理（Softmax、ラベルマッピング）
+- 他のCNNモデルとの比較
+  - VGG、GoogLeNet、DenseNet、EfficientNet、Vision Transformer
+  - 精度・パラメータ数・速度の比較表
+- モデルの使い分け（ユースケース別推奨）
+  - リアルタイム推論、高精度重視、転移学習、エッジデバイス、物体検出、医療画像
+- 実装パターン（ONNXモデル、転移学習、アンサンブル、A/Bテスト）
+- よくある質問（ResNet-50 vs ResNet-101、転移学習、前処理の必要性、GPU vs CPU）
+
+#### 🎯 こんな時に読む
+- 「ResNetって何？」
+- 「どのCNNモデルを選べばいい？」
+- 「ResNet-50の使い方を知りたい」
+- 「ImageNet正規化って何？」
+- 「VGGとResNetの違いは？」
+- 「EfficientNetとResNetどちらを使うべき？」
+- 「転移学習に最適なモデルは？」
+- 「Prep-Pred PatternでResNet50を使いたい」
+
+#### ⏱️ 読了時間
+約50分
+
+---
+
 ## 🎓 学習の進め方
 
 ### 初心者向けの推奨順序
@@ -261,7 +295,7 @@
 6. ONNX推論パターン完全ガイド
    ↓ (モデルデプロイ)
 
-7. Docker & Kubernetes 入門ガイド ⭐ NEW!
+7. Docker & Kubernetes 入門ガイド ⭐
    ↓ (コンテナ化・オーケストレーション)
 
 8. One-Class SVMと外れ値検出手法
@@ -270,7 +304,10 @@
 9. PyTorch画像分類 完全ガイド
    ↓ (深層学習)
 
-10. 実際のプロジェクトに適用
+10. ResNetとCNNモデル使い分けガイド ⭐ NEW!
+   ↓ (モデル選択・画像分類)
+
+11. 実際のプロジェクトに適用
 ```
 
 ### シナリオ別ガイド
@@ -310,6 +347,10 @@
 | 異常検知の手法がわからない | [One-Class SVMと外れ値検出手法](./07_one_class_svm_and_anomaly_detection.md) |
 | PyTorchの使い方がわからない | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
 | CNNの仕組みを知りたい | [PyTorch画像分類 完全ガイド](./08_pytorch_image_classification_guide.md) |
+| ResNetって何？ | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
+| どのCNNモデルを選べばいい？ | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
+| ImageNet正規化がわからない | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
+| モデルの使い分けを知りたい | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
 
 ---
 
@@ -326,6 +367,7 @@
 | **One-Class SVMと外れ値検出手法** | 中級 | ⭐⭐⭐ | 約600行 |
 | **PyTorch画像分類 完全ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約1100行 |
 | **Docker & Kubernetes 入門ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約850行 |
+| **ResNetとCNNモデル使い分けガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約800行 |
 
 ---
 
@@ -373,8 +415,10 @@
 - 学習を通じて得た知見を追加
 
 ### 更新履歴
+- **2025-11-13**:
+  - ResNetとCNNモデル使い分けガイドを追加 ⭐ NEW!
 - **2025-11-06**:
-  - Docker & Kubernetes 入門ガイドを追加 ⭐ NEW!
+  - Docker & Kubernetes 入門ガイドを追加 ⭐
 - **2025-11-05**:
   - One-Class SVMと外れ値検出手法を追加
   - PyTorch画像分類 完全ガイドを追加 ⭐
@@ -414,7 +458,8 @@
 ├── 06_onnx_inference_patterns.md                # ONNX推論パターン完全ガイド ⭐
 ├── 07_one_class_svm_and_anomaly_detection.md    # One-Class SVMと外れ値検出手法
 ├── 08_pytorch_image_classification_guide.md     # PyTorch画像分類 完全ガイド ⭐
-└── 09_docker_kubernetes_basics.md               # Docker & Kubernetes 入門ガイド ⭐
+├── 09_docker_kubernetes_basics.md               # Docker & Kubernetes 入門ガイド ⭐
+└── 10_resnet_and_cnn_models_guide.md            # ResNetとCNNモデル使い分けガイド ⭐
 ```
 
 ---
