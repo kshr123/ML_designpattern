@@ -1,73 +1,227 @@
+# ================================================================================
+# docker-compose.yml - Batch Pattern マルチコンテナ構成
+# ================================================================================
+#
+# 【このファイルの目的】
+#   - バッチ推論システムに必要な4つのサービスを管理
+#   - データベース、API、バッチジョブの連携を定義
+#   - 開発環境とテスト環境の分離
+#
+# 【システム全体像】
+#
+#   ┌───────────────────────────────────────────────────────────┐
+#   │                   Docker Network (bridge)                 │
+#   │                                                           │
+#   │  ┌──────────────┐       ┌──────────────┐                │
+#   │  │  MySQL       │       │  MySQL Test  │                │
+#   │  │  (本番DB)    │       │  (テスト用)  │                │
+#   │  │  Port: 3306  │       │  Port: 3307  │                │
+#   │  └──────┬───────┘       └──────────────┘                │
+#   │         │                                                 │
+#   │         │ 読み書き                                        │
+#   │         ↓                                                 │
+#   │  ┌─────────────────────┐    ┌────────────────────────┐  │
+#   │  │   API Service       │    │  Batch Job Service     │  │
+#   │  │   (FastAPI)         │    │  (定期実行)            │  │
+#   │  │   Port: 8000        │    │  - 60秒待機            │  │
+#   │  │                     │    │  - 未推論データ取得    │  │
+#   │  │  - データ登録のみ   │    │  - 並列推論(4スレッド)│  │
+#   │  │  - 結果取得         │    │  - 結果をDB保存        │  │
+#   │  └─────────────────────┘    └────────────────────────┘  │
+#   │         ↑                                                 │
+#   │    HTTP:8000 (外部公開)                                  │
+#   └───────────────────────────────────────────────────────────┘
+#             ↑
+#        ユーザー
+#
+# 【データフロー】
+#   1. ユーザー → API (POST /predict) ........ データ登録（即座に推論しない）
+#   2. API → MySQL ............................ itemsテーブルに保存
+#   3. [60秒待機] ............................ バッチジョブが起動を待つ
+#   4. バッチジョブ → MySQL .................. 未推論データを取得
+#   5. バッチジョブ → 並列推論 ............... ThreadPoolExecutor (4並列)
+#   6. バッチジョブ → MySQL .................. predictionsテーブルに保存
+#   7. ユーザー → API (GET /predict/id/{id}).. 推論結果を取得
+#   8. API → MySQL → ユーザー ................ 推論結果を返却
+#
+# 【起動方法】
+#   docker compose up --build    # ビルド & 起動
+#   docker compose up -d         # バックグラウンド起動
+#   docker compose logs -f job   # バッチジョブのログ確認
+#   docker compose down          # 停止 & 削除
+#
+# ================================================================================
+
 services:
-  # 本番用MySQLデータベース
+  # ==============================================================================
+  # MySQL: 本番用データベース
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - ユーザーデータと推論結果を永続化
+  #   - itemsテーブル: 入力データ
+  #   - predictionsテーブル: 推論結果
+  #
+  # 【なぜMySQLを使うのか】
+  #   - リレーショナルデータベース（トランザクション保証）
+  #   - 本番環境でよく使われる（実践的な学習）
+  #   - SQLAlchemyで簡単に扱える
+  #
   mysql:
+    # 公式MySQLイメージ（バージョン8.0）
     image: mysql:8.0
     container_name: batch_pattern_mysql
+
+    # MySQL初期設定
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: sample_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: userpassword
+      MYSQL_ROOT_PASSWORD: password        # rootユーザーのパスワード
+      MYSQL_DATABASE: sample_db            # 作成するデータベース名
+      MYSQL_USER: user                     # アプリ用ユーザー
+      MYSQL_PASSWORD: userpassword         # アプリ用パスワード
+
+    # ポートマッピング（ホスト:コンテナ）
+    # ホストの3306番ポートで外部からもアクセス可能
     ports:
       - "3306:3306"
+
+    # ボリュームマウント
+    # データを永続化（コンテナ削除してもデータは残る）
     volumes:
       - mysql_data:/var/lib/mysql
+
+    # MySQL起動オプション
+    # UTF-8 (utf8mb4) で文字化け防止
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+    # ヘルスチェック
+    # 他のサービスがMySQLの準備完了を待つために使用
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ppassword"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 10s       # 10秒ごとにチェック
+      timeout: 5s         # タイムアウト5秒
+      retries: 5          # 5回失敗したら unhealthy
 
-  # テスト用MySQLデータベース
+  # ==============================================================================
+  # MySQL Test: テスト専用データベース
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - pytestのE2Eテスト用データベース
+  #   - 本番DBと分離して安全にテスト実行
+  #
+  # 【なぜテスト用DBを分けるのか】
+  #   - 本番データを汚染しない
+  #   - テストデータを自由に作成・削除できる
+  #   - 並列テスト実行時の競合を防ぐ
+  #
   mysql_test:
     image: mysql:8.0
     container_name: batch_pattern_mysql_test
+
+    # テスト用の設定（本番とは別の認証情報）
     environment:
       MYSQL_ROOT_PASSWORD: test_password
       MYSQL_DATABASE: test_db
       MYSQL_USER: test_user
       MYSQL_PASSWORD: test_password
+
+    # ポート3307で公開（本番DBの3306と衝突回避）
     ports:
       - "3307:3306"
+
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptest_password"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # APIサービス
+  # ==============================================================================
+  # API Service: FastAPIによるREST APIサービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - データ登録エンドポイント（POST /predict）
+  #   - 推論結果取得エンドポイント（GET /predict/id/{id}）
+  #   - ヘルスチェック、メタデータ、ラベル取得
+  #
+  # 【重要な設計】
+  #   - データ登録時は推論を実行しない（即座にIDを返す）
+  #   - 実際の推論はバッチジョブが非同期で実行
+  #   - これによりAPIレスポンスが高速（< 50ms）
+  #
   api:
+    # Dockerfileからビルド
     build:
-      context: .
+      context: .              # カレントディレクトリをビルドコンテキストに
       dockerfile: Dockerfile
+
+    # イメージ名（jobサービスと同じイメージを再利用）
     image: batch-pattern:latest
     container_name: batch_pattern_api
+
+    # ポート8000で公開
+    # ホストからは http://localhost:8000 でアクセス
     ports:
       - "8000:8000"
+
+    # 環境変数の設定
+    # Dockerfileのデフォルト値を上書き
     environment:
       PLATFORM: docker
-      MYSQL_SERVER: mysql
+      MYSQL_SERVER: mysql           # MySQLサービスにサービス名で接続
       MYSQL_PORT: 3306
       MYSQL_USER: user
       MYSQL_PASSWORD: userpassword
       MYSQL_DATABASE: sample_db
       MODEL_FILEPATH: models/iris_svc.onnx
       LABEL_FILEPATH: models/label.json
+
+    # 依存関係
+    # MySQLが健全になってから起動
     depends_on:
       mysql:
         condition: service_healthy
+
+    # 再起動ポリシー
+    # クラッシュしても自動再起動（手動停止時は再起動しない）
     restart: unless-stopped
 
-  # バッチジョブサービス
+  # ==============================================================================
+  # Batch Job Service: 定期バッチ推論ジョブ
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - 60秒ごとにループ実行
+  #   - DBから未推論データを取得
+  #   - ThreadPoolExecutor（4並列）で推論
+  #   - 推論結果をDBに保存
+  #
+  # 【なぜバッチ処理にするのか】
+  #   - リアルタイム性が不要な場合にコスト削減
+  #   - データをまとめて処理することで効率化
+  #   - APIサーバーのリソースを推論に使わない
+  #   - GPUリソースを集中的に使える（本実装ではCPU）
+  #
+  # 【並列処理の仕組み】
+  #   - ThreadPoolExecutor: Pythonの標準ライブラリ
+  #   - 4スレッドで並列推論
+  #   - I/Oバウンド（DB読み書き、推論）に適している
+  #
   job:
+    # APIサービスと同じイメージを使用
     build:
       context: .
       dockerfile: Dockerfile
     image: batch-pattern:latest
     container_name: batch_pattern_job
+
+    # 【重要】コマンドをオーバーライド
+    # Dockerfileのデフォルト（uvicorn）ではなく、バッチジョブを起動
     command: python -m src.task.job
+
+    # 環境変数の設定
     environment:
       PLATFORM: docker
       MYSQL_SERVER: mysql
@@ -77,12 +231,27 @@ services:
       MYSQL_DATABASE: sample_db
       MODEL_FILEPATH: models/iris_svc.onnx
       LABEL_FILEPATH: models/label.json
-      BATCH_WAIT_TIME: 60
-      WORKER_THREADS: 4
+      BATCH_WAIT_TIME: 60    # 60秒ごとにバッチ実行
+      WORKER_THREADS: 4      # 4並列で推論
+
+    # 依存関係
+    # MySQLが健全になってから起動
     depends_on:
       mysql:
         condition: service_healthy
+
+    # 再起動ポリシー
+    # クラッシュしても自動再起動
     restart: unless-stopped
 
+# ================================================================================
+# ボリューム定義
+# ================================================================================
+#
+# 【mysql_data】
+#   - MySQLデータの永続化
+#   - コンテナを削除してもデータは残る
+#   - docker compose down -v で削除される
+#
 volumes:
   mysql_data:

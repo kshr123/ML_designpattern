@@ -1,62 +1,249 @@
+# ================================================================================
+# docker-compose.yml - Asynchronous Pattern マルチコンテナ構成
+# ================================================================================
+#
+# 【このファイルの目的】
+#   - 非同期推論システムに必要な3つのサービスを管理
+#   - Proxy（API）、Worker（推論）、Redis（キュー+ストア）の連携
+#   - スケーラブルな推論システムの構築
+#
+# 【システム全体像】
+#
+#   ┌──────────────────────────────────────────────────────┐
+#   │               Docker Network (async_network)         │
+#   │                                                      │
+#   │  ┌─────────────┐                                    │
+#   │  │   Proxy     │                                    │
+#   │  │  (FastAPI)  │                                    │
+#   │  │  Port: 8000 │                                    │
+#   │  └──────┬──────┘                                    │
+#   │         │ LPUSH job_id                              │
+#   │         ↓                                            │
+#   │  ┌────────────────┐                                 │
+#   │  │   Redis        │                                 │
+#   │  │  (キュー+DB)   │                                 │
+#   │  │  Port: 6379    │                                 │
+#   │  └────────┬───────┘                                 │
+#   │           │ BRPOP job_id                            │
+#   │           ↓                                          │
+#   │  ┌─────────────────────┐   ┌─────────────────────┐ │
+#   │  │   Worker 1          │   │   Worker 2          │ │
+#   │  │  (ONNX Runtime)     │   │  (ONNX Runtime)     │ │
+#   │  │  - キュー監視       │   │  - キュー監視       │ │
+#   │  │  - 推論実行         │   │  - 推論実行         │ │
+#   │  │  - 結果保存         │   │  - 結果保存         │ │
+#   │  └─────────────────────┘   └─────────────────────┘ │
+#   │                                                      │
+#   └──────────────────────────────────────────────────────┘
+#            ↑
+#       ユーザー
+#
+# 【データフロー】
+#   1. ユーザー → Proxy (POST /predict) .... リクエスト送信
+#   2. Proxy → job_id発行 ..................... UUID生成
+#   3. Proxy → Redis (LPUSH) .................. キューに登録
+#   4. Proxy → ユーザー ....................... job_id即座に返却（ブロックしない）
+#   5. Worker → Redis (BRPOP) ................. キューからジョブ取得（ブロック待機）
+#   6. Worker → Redis (GET) ................... ジョブデータ取得
+#   7. Worker → ONNX Runtime .................. 推論実行
+#   8. Worker → Redis (SET) ................... 推論結果保存
+#   9. ユーザー → Proxy (GET /job/{job_id}) .. 結果取得
+#  10. Proxy → Redis (GET) .................... 結果取得して返却
+#
+# 【起動方法】
+#   docker compose up --build    # ビルド & 起動
+#   docker compose up -d         # バックグラウンド起動
+#   docker compose logs -f worker # Workerのログ確認
+#   docker compose down          # 停止 & 削除
+#   docker compose scale worker=4 # Worker数を4に変更（スケールアウト）
+#
+# ================================================================================
+
 version: "3.8"
 
 services:
-  # ========================================
-  # Proxy (FastAPI)
-  # ========================================
+  # ==============================================================================
+  # Proxy Service: FastAPIによるHTTP APIサービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - クライアントとの窓口
+  #   - リクエスト受付、job_id発行
+  #   - Redisキューへのジョブ登録
+  #   - ジョブステータス・結果の取得API提供
+  #
+  # 【なぜProxyを分離するのか】
+  #   - リクエスト受付は軽量 → 高速レスポンス（< 10ms）
+  #   - 推論処理はWorkerに任せる → Proxyがブロックされない
+  #   - Workerを独立してスケール可能
+  #
+  # 【エンドポイント】
+  #   - POST /predict: ジョブ登録、即座にjob_idを返す
+  #   - GET /job/{job_id}: ジョブステータス取得
+  #   - GET /job/{job_id}/result: 推論結果取得
+  #   - GET /health: ヘルスチェック
+  #
   proxy:
+    # Dockerfileからビルド
     build:
-      context: .
+      context: .              # カレントディレクトリをビルドコンテキストに
       dockerfile: Dockerfile.proxy
+
+    # コンテナ名
     container_name: async_proxy
+
+    # ポート8000で公開
+    # ホストからは http://localhost:8000 でアクセス
     ports:
       - "8000:8000"
+
+    # 環境変数の設定
+    # src/proxy/config.py で os.getenv() により読み込まれる
     environment:
-      - REDIS_HOST=redis
+      - REDIS_HOST=redis      # Redisサービスにサービス名で接続
       - REDIS_PORT=6379
-      - QUEUE_NAME=predict_queue
+      - QUEUE_NAME=predict_queue  # Redisキュー名
+
+    # 依存関係
+    # Redisが起動してから起動
     depends_on:
       - redis
+
+    # ネットワークに接続
+    # 同じネットワーク内のサービスはサービス名で通信可能
     networks:
       - async_network
+
+    # 再起動ポリシー
+    # クラッシュしても常に再起動
     restart: always
 
-  # ========================================
-  # Worker (推論実行 - ONNX Runtime)
-  # ========================================
+  # ==============================================================================
+  # Worker Service: ONNX Runtimeによる推論実行サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - Redisキューからジョブを取得（BRPOP: ブロッキング方式）
+  #   - 入力データを取得
+  #   - ONNX Runtimeで推論実行
+  #   - 推論結果をRedisに保存
+  #
+  # 【なぜBRPOP（ブロッキング）を使うのか】
+  #   【従来のポーリング方式の問題】
+  #     while True:
+  #         job = redis.rpop(queue)
+  #         if not job:
+  #             time.sleep(0.1)  # CPU無駄遣い、遅延あり
+  #
+  #   【BRPOP方式の利点】
+  #     while True:
+  #         job = redis.brpop(queue, timeout=1)  # ジョブが来るまでブロック
+  #         # ジョブが来たら即座に処理
+  #
+  #   - CPU効率: アイドル時のCPU使用率がほぼゼロ
+  #   - 低レイテンシ: ジョブ到着時に即座に処理開始
+  #   - Redis負荷軽減: ポーリングによる無駄なクエリがない
+  #
+  # 【スケールアウト】
+  #   - deploy.replicas: 2 で2つのWorkerを起動
+  #   - 各WorkerがBRPOPで待機
+  #   - 先着順で1つのWorkerだけがジョブを取得（重複なし）
+  #   - スループット向上: 並列処理で処理速度が2倍
+  #
   worker:
+    # Dockerfileからビルド
     build:
       context: .
       dockerfile: Dockerfile.worker
+
+    # コンテナ名
     container_name: async_worker
+
+    # 環境変数の設定
+    # src/worker/config.py で読み込まれる
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - QUEUE_NAME=predict_queue
-      - NUM_WORKERS=2
-      - BRPOP_TIMEOUT=1
-      - PREDICTION_TIMEOUT=10
+      - NUM_WORKERS=2              # Worker内の並列スレッド数（通常は1）
+      - BRPOP_TIMEOUT=1            # BRPOP のタイムアウト（秒）
+      - PREDICTION_TIMEOUT=10      # 推論のタイムアウト（秒）
+
+    # 依存関係
+    # Redisが起動してから起動
     depends_on:
       - redis
+
+    # ネットワークに接続
     networks:
       - async_network
+
+    # 再起動ポリシー
+    # クラッシュしても常に再起動
     restart: always
-    # 複数Workerを起動する場合
+
+    # 【重要】レプリカ設定
+    # 複数のWorkerコンテナを起動（水平スケーリング）
+    # 各Workerは独立して動作し、BRPOPで競合なくジョブを取得
     deploy:
       replicas: 2
 
-  # ========================================
-  # Redis (キュー + キャッシュ)
-  # ========================================
+  # ==============================================================================
+  # Redis: ジョブキュー + データストア
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - ジョブキュー: LPUSHでジョブを登録、BRPOPでジョブを取得
+  #   - データストア: ジョブデータ、推論結果、ステータスを保存
+  #
+  # 【なぜRedisを使うのか】
+  #   - インメモリDB: 高速な読み書き
+  #   - キューのサポート: LPUSH/BRPOPで効率的なキュー実装
+  #   - 有効期限（TTL）: 古いジョブを自動削除可能
+  #   - 軽量: アルパインイメージで小さい
+  #
+  # 【Redisのキー設計】
+  #   - predict_queue: ジョブIDのキュー（LPUSH/BRPOP）
+  #   - job:{job_id}:data: 入力データ（JSON）
+  #   - job:{job_id}:status: ステータス（pending/processing/completed/failed）
+  #   - job:{job_id}:result: 推論結果（JSON）
+  #   - job:{job_id}:error: エラーメッセージ
+  #
+  # 【ステータス遷移】
+  #   pending → processing → completed
+  #                       └→ failed（エラー時）
+  #
   redis:
+    # 公式Redisイメージ（バージョン7、アルパイン版で軽量）
     image: redis:7-alpine
     container_name: async_redis
+
+    # ポート6379で公開
+    # ホストからも redis-cli で接続可能
     ports:
       - "6379:6379"
+
+    # ネットワークに接続
     networks:
       - async_network
+
+    # 再起動ポリシー
+    # クラッシュしても常に再起動
     restart: always
 
+# ================================================================================
+# ネットワーク定義
+# ================================================================================
+#
+# 【async_network】
+#   - 3つのサービスを接続するプライベートネットワーク
+#   - bridge driver: 同じホスト上のコンテナ間通信
+#   - サービス名（proxy, redis, worker）で名前解決可能
+#
+# 【例】proxyコンテナ内から
+#   ping redis          → redisコンテナに到達
+#   redis-cli -h redis  → Redisに接続
+#
 networks:
   async_network:
     driver: bridge
