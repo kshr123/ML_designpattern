@@ -1,0 +1,39 @@
+# ================================================================================
+# Dockerfile.service - 各専門サービス（Setosa/Versicolor/Virginica）
+# ================================================================================
+#
+# 【このDockerfileの目的】
+#   - バイナリ分類器として動作する専門サービスを構築
+#   - 環境変数MODEで使用するモデルを切り替え
+#   - ONNX Runtimeで推論を実行
+#
+# 【使用方法】
+#   docker build -t service:setosa -f Dockerfile.service .
+#   docker run -e MODE=setosa -p 8000:8000 service:setosa
+#
+# ================================================================================
+
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# 依存関係のインストール
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    onnxruntime \
+    numpy \
+    pydantic
+
+# モデルファイルをコピー
+COPY models/ ./models/
+
+# ソースコードをコピー
+COPY src/ ./src/
+
+# ポート公開
+EXPOSE 8000
+
+# 起動コマンド
+# 環境変数MODEに応じて適切なモデルを使用
+CMD ["uvicorn", "src.services.app:app", "--host", "0.0.0.0", "--port", "8000"]

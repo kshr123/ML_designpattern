@@ -1,0 +1,178 @@
+# ================================================================================
+# docker-compose.yml - Horizontal Microservice Pattern マルチコンテナ構成
+# ================================================================================
+#
+# 【このファイルの目的】
+#   - 水平マイクロサービスパターンに必要な4つのサービスを管理
+#   - Proxy、Service Setosa、Service Versicolor、Service Virginicaの連携
+#   - 並列推論システムの構築
+#
+# 【システム全体像】
+#
+#   ┌──────────────────────────────────────────────────────┐
+#   │             Docker Network (hms_network)             │
+#   │                                                      │
+#   │  ┌─────────────┐                                    │
+#   │  │   Proxy     │                                    │
+#   │  │  (FastAPI)  │                                    │
+#   │  │  Port: 9000 │                                    │
+#   │  └──────┬──────┘                                    │
+#   │         │ asyncio.gather                            │
+#   │         ├───────────┬──────────┐                    │
+#   │         ↓           ↓          ↓                    │
+#   │  ┌──────────┐ ┌──────────┐ ┌──────────┐           │
+#   │  │ Service  │ │ Service  │ │ Service  │           │
+#   │  │ Setosa   │ │Versicolor│ │Virginica │           │
+#   │  │Port: 8000│ │Port: 8001│ │Port: 8002│           │
+#   │  │ONNX Model│ │ONNX Model│ │ONNX Model│           │
+#   │  └──────────┘ └──────────┘ └──────────┘           │
+#   │                                                      │
+#   └──────────────────────────────────────────────────────┘
+#
+# 【データフロー】
+#   1. ユーザー → Proxy (POST /predict) ................. リクエスト送信
+#   2. Proxy → 3サービスに並列リクエスト ................ asyncio.gather
+#   3. 各サービス → ONNX Runtime ........................ バイナリ分類
+#   4. 各サービス → Proxy ............................... 結果返却
+#   5. Proxy → ユーザー .................................. 結果集約して返却
+#
+# 【起動方法】
+#   docker compose build       # イメージビルド
+#   docker compose up -d       # バックグラウンド起動
+#   docker compose logs -f     # ログ確認
+#   docker compose down        # 停止 & 削除
+#
+# ================================================================================
+
+version: "3.8"
+
+services:
+  # ==============================================================================
+  # Proxy Service: FastAPIによるリクエスト集約サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - クライアントとの窓口
+  #   - 3つの専門サービスに並列リクエスト送信
+  #   - 結果を集約して返却
+  #
+  # 【なぜProxyを分離するのか】
+  #   - API Composition Pattern（APIコンポジションパターン）
+  #   - 複数のマイクロサービスを組み合わせて1つのレスポンスを作成
+  #   - 各サービスを独立して開発・デプロイ可能
+  #
+  # 【並列実行の仕組み】
+  #   - asyncio.gatherで3つのHTTPリクエストを並列実行
+  #   - httpx.AsyncClientで非同期HTTP通信
+  #   - 全サービスのレスポンスを待ってから返却
+  #
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    container_name: hms_proxy
+    ports:
+      - "9100:9000"
+    environment:
+      - PORT=9000
+      - SERVICE_SETOSA=http://service_setosa:8000
+      - SERVICE_VERSICOLOR=http://service_versicolor:8000
+      - SERVICE_VIRGINICA=http://service_virginica:8000
+    depends_on:
+      - service_setosa
+      - service_versicolor
+      - service_virginica
+    networks:
+      - hms_network
+    restart: always
+
+  # ==============================================================================
+  # Service Setosa: Setosaバイナリ分類サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - Irisデータが"setosa"かどうかを判定
+  #   - ONNX Runtime推論
+  #   - 確率を返却 [P(setosa), P(not setosa)]
+  #
+  # 【モデル】
+  #   - iris_svc_0_setosa.onnx
+  #   - Scikit-learn SVCをONNX形式に変換
+  #
+  service_setosa:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+    container_name: hms_service_setosa
+    ports:
+      - "9101:8000"
+    environment:
+      - PORT=8000
+      - MODE=setosa
+    networks:
+      - hms_network
+    restart: always
+
+  # ==============================================================================
+  # Service Versicolor: Versicolorバイナリ分類サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - Irisデータが"versicolor"かどうかを判定
+  #   - ONNX Runtime推論
+  #   - 確率を返却 [P(versicolor), P(not versicolor)]
+  #
+  # 【モデル】
+  #   - iris_svc_0_versicolor.onnx
+  #
+  service_versicolor:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+    container_name: hms_service_versicolor
+    ports:
+      - "9102:8000"
+    environment:
+      - PORT=8000
+      - MODE=versicolor
+    networks:
+      - hms_network
+    restart: always
+
+  # ==============================================================================
+  # Service Virginica: Virginicaバイナリ分類サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - Irisデータが"virginica"かどうかを判定
+  #   - ONNX Runtime推論
+  #   - 確率を返却 [P(virginica), P(not virginica)]
+  #
+  # 【モデル】
+  #   - iris_svc_0_virginica.onnx
+  #
+  service_virginica:
+    build:
+      context: .
+      dockerfile: Dockerfile.service
+    container_name: hms_service_virginica
+    ports:
+      - "9103:8000"
+    environment:
+      - PORT=8000
+      - MODE=virginica
+    networks:
+      - hms_network
+    restart: always
+
+# ================================================================================
+# ネットワーク定義
+# ================================================================================
+#
+# 【hms_network】
+#   - 4つのサービスを接続するプライベートネットワーク
+#   - サービス名（proxy, service_setosa等）で名前解決可能
+#
+networks:
+  hms_network:
+    driver: bridge

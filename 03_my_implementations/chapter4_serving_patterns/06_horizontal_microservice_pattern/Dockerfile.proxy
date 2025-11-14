@@ -1,0 +1,34 @@
+# ================================================================================
+# Dockerfile.proxy - Proxyサービス
+# ================================================================================
+#
+# 【このDockerfileの目的】
+#   - 3つの専門サービスに並列リクエストを送信するProxyを構築
+#   - asyncio.gatherで並列実行
+#   - httpx.AsyncClientでHTTP通信
+#
+# 【使用方法】
+#   docker build -t proxy -f Dockerfile.proxy .
+#   docker run -e SERVICE_SETOSA=http://service_setosa:8000 -p 9000:9000 proxy
+#
+# ================================================================================
+
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# 依存関係のインストール
+RUN pip install --no-cache-dir \
+    fastapi \
+    uvicorn \
+    httpx \
+    pydantic
+
+# ソースコードをコピー
+COPY src/ ./src/
+
+# ポート公開
+EXPOSE 9000
+
+# 起動コマンド
+CMD ["uvicorn", "src.proxy.app:app", "--host", "0.0.0.0", "--port", "9000"]
