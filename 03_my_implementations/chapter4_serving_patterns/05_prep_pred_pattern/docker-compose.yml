@@ -1,0 +1,179 @@
+# ================================================================================
+# docker-compose.yml - Prep-Pred Pattern マルチコンテナ構成
+# ================================================================================
+#
+# 【このファイルの目的】
+#   - 前処理サービス（Prep）と推論サービス（Pred）の2つのコンテナを管理
+#   - サービス間のネットワーク通信を設定
+#   - 依存関係とヘルスチェックを定義
+#
+# 【システム全体像】
+#
+#   ┌─────────────────────────────────────────────────────────────┐
+#   │                        Docker Network                       │
+#   │                   (prep_pred_network)                       │
+#   │                                                             │
+#   │  ┌──────────────────────┐       ┌─────────────────────┐   │
+#   │  │   Prep Service       │ gRPC  │   Pred Service      │   │
+#   │  │   (FastAPI)          │------>│ (ONNX Runtime)      │   │
+#   │  │                      │:50051 │                     │   │
+#   │  │  - 画像デコード      │       │ - ResNet50推論      │   │
+#   │  │  - 前処理            │       │ - ImageNet分類      │   │
+#   │  │  - 後処理(Softmax)   │       │ - gRPCサーバー      │   │
+#   │  │  - gRPCクライアント  │       │                     │   │
+#   │  └──────────────────────┘       └─────────────────────┘   │
+#   │           ↑                              ↑                 │
+#   │    HTTP:8002 (外部公開)          HTTP:8001 (外部公開)      │
+#   └─────────────────────────────────────────────────────────────┘
+#              ↑
+#         ユーザー（クライアント）
+#
+# 【通信フロー】
+#   1. ユーザー → Prep (HTTP POST /predict/label) ... Base64画像
+#   2. Prep → Pred (gRPC :50051) .................... 前処理済みnumpy配列
+#   3. Pred → Prep (gRPCレスポンス) ................. ロジット（1000次元）
+#   4. Prep → ユーザー (HTTP Response) .............. ラベル名 "web site"
+#
+# 【起動方法】
+#   docker compose up --build    # ビルド & 起動
+#   docker compose up -d         # バックグラウンド起動
+#   docker compose down          # 停止 & 削除
+#   docker compose logs -f prep  # prepのログを表示
+#
+# ================================================================================
+
+version: "3.8"
+
+services:
+  # ==============================================================================
+  # Pred Service: ONNX Runtime Serverによる推論サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - ResNet50モデルで画像分類推論を実行
+  #   - gRPC（Port 50051）とHTTP（Port 8001）でエンドポイント公開
+  #   - 前処理済みデータ（numpy配列）を受け取り、ロジットを返す
+  #
+  # 【なぜ先に起動するか】
+  #   - Prepサービスは起動時にPredサービスとのgRPC接続が必要
+  #   - depends_on と healthcheck で Pred が準備完了してから Prep を起動
+  #
+  pred:
+    # コンテナ名（docker ps で表示される名前）
+    container_name: prep_pred_pattern_pred
+
+    # Dockerfileからビルド
+    build:
+      context: .              # カレントディレクトリをビルドコンテキストに
+      dockerfile: Dockerfile.pred
+
+    # ビルドされたイメージ名
+    image: prep_pred_pattern_pred:latest
+
+    # 再起動ポリシー: コンテナが停止したら常に再起動
+    restart: always
+
+    # 環境変数の設定
+    # これらの値は onnx_runtime_server_entrypoint.sh で参照される
+    environment:
+      - HTTP_PORT=8001     # ONNX Runtime ServerのHTTPポート
+      - GRPC_PORT=50051    # ONNX Runtime ServerのgRPCポート
+
+    # ポートマッピング（ホスト:コンテナ）
+    ports:
+      - "8001:8001"   # HTTP REST API（オプション、デバッグ用）
+      - "50051:50051" # gRPC endpoint（Prepサービスから接続）
+
+    # ネットワークに接続
+    # 同じネットワーク内のサービスはサービス名で通信可能
+    networks:
+      - prep_pred_network
+
+    # ヘルスチェック設定
+    # Prepサービスが起動する前に、Predサービスの準備完了を確認
+    healthcheck:
+      test: ["CMD-SHELL", "exit 0"]  # シンプルなチェック（常に成功）
+      interval: 10s       # 10秒ごとにチェック
+      timeout: 5s         # タイムアウト5秒
+      retries: 3          # 3回失敗したら unhealthy と判定
+      start_period: 10s   # 起動後10秒間は失敗を無視
+
+  # ==============================================================================
+  # Prep Service: FastAPIによる前処理・後処理サービス
+  # ==============================================================================
+  #
+  # 【役割】
+  #   - ユーザーからBase64画像を受信（HTTP POST）
+  #   - 画像を前処理（リサイズ、正規化）
+  #   - PredサービスにgRPCで推論リクエスト
+  #   - ロジットをSoftmax変換して確率に
+  #   - ラベル名に変換してユーザーに返却
+  #
+  # 【依存関係】
+  #   - Predサービスが healthy になってから起動
+  #   - これによりgRPC接続失敗を防ぐ
+  #
+  prep:
+    # コンテナ名
+    container_name: prep_pred_pattern_prep
+
+    # Dockerfileからビルド
+    build:
+      context: .
+      dockerfile: Dockerfile.prep
+
+    # ビルドされたイメージ名
+    image: prep_pred_pattern_prep:latest
+
+    # 再起動ポリシー
+    restart: always
+
+    # 環境変数の設定
+    # src/configurations.py で os.getenv() により読み込まれる
+    environment:
+      - PLATFORM=docker_compose           # 実行環境識別
+      - API_ADDRESS=pred                  # 推論サービスのホスト名（サービス名で解決）
+      - GRPC_PORT=50051                   # gRPCポート
+      - ONNX_INPUT_NAME=input             # ONNXモデルの入力テンソル名
+      - ONNX_OUTPUT_NAME=output           # ONNXモデルの出力テンソル名
+
+    # ポートマッピング
+    # 注意: コンテナ内では8000、ホスト側では8002で公開
+    # 理由: 他のサービスとのポート衝突を避けるため
+    ports:
+      - "8002:8000"  # ユーザーは localhost:8002 でアクセス
+
+    # ネットワークに接続
+    networks:
+      - prep_pred_network
+
+    # 依存関係の定義
+    # Predサービスが健全（healthy）になってから起動
+    depends_on:
+      pred:
+        condition: service_healthy
+
+    # ヘルスチェック設定
+    healthcheck:
+      test: ["CMD-SHELL", "exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+# ================================================================================
+# ネットワーク定義
+# ================================================================================
+#
+# 【prep_pred_network】
+#   - 両サービスを接続するプライベートネットワーク
+#   - bridge driver: 同じホスト上のコンテナ間通信
+#   - サービス名（prep, pred）で名前解決可能
+#
+# 【例】prepコンテナ内から
+#   ping pred          → pred コンテナに到達
+#   curl pred:50051    → predのgRPCエンドポイントに接続
+#
+networks:
+  prep_pred_network:
+    driver: bridge

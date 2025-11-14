@@ -7,11 +7,9 @@ TDDアプローチ:
 """
 
 import json
-from typing import List
 from unittest.mock import MagicMock, Mock, patch
 
 import numpy as np
-import pytest
 from PIL import Image
 
 # テスト対象のインポート（実装前なのでImportErrorになる）
@@ -39,9 +37,7 @@ class TestClassifierInit:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_init_with_default_params(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_init_with_default_params(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """デフォルトパラメータで初期化できる"""
         # モックの設定
         mock_preprocess_transformer = Mock()
@@ -50,9 +46,7 @@ class TestClassifierInit:
             mock_preprocess_transformer,
             mock_softmax_transformer,
         ]
-        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(
-            ["cat", "dog"]
-        )
+        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(["cat", "dog"])
 
         classifier = Classifier(
             preprocess_transformer_path="/test/preprocess.pkl",
@@ -71,9 +65,7 @@ class TestClassifierInit:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_init_with_custom_params(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_init_with_custom_params(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """カスタムパラメータで初期化できる"""
         mock_preprocess_transformer = Mock()
         mock_softmax_transformer = Mock()
@@ -81,9 +73,7 @@ class TestClassifierInit:
             mock_preprocess_transformer,
             mock_softmax_transformer,
         ]
-        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(
-            ["cat", "dog"]
-        )
+        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(["cat", "dog"])
 
         classifier = Classifier(
             preprocess_transformer_path="/custom/preprocess.pkl",
@@ -105,16 +95,12 @@ class TestClassifierLoadModel:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_load_preprocess_transformer(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_load_preprocess_transformer(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """前処理transformerを読み込める"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
         mock_joblib_load.side_effect = [mock_preprocess, mock_softmax]
-        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(
-            ["cat"]
-        )
+        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(["cat"])
 
         classifier = Classifier(
             preprocess_transformer_path="/test/preprocess.pkl",
@@ -127,16 +113,12 @@ class TestClassifierLoadModel:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_load_softmax_transformer(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_load_softmax_transformer(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """Softmax transformerを読み込める"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
         mock_joblib_load.side_effect = [mock_preprocess, mock_softmax]
-        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(
-            ["cat"]
-        )
+        mock_open.return_value.__enter__.return_value.read.return_value = json.dumps(["cat"])
 
         classifier = Classifier(
             preprocess_transformer_path="/test/preprocess.pkl",
@@ -153,9 +135,7 @@ class TestClassifierLoadLabel:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open", new_callable=MagicMock)
-    def test_load_label_from_json(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_load_label_from_json(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """JSONファイルからラベルを読み込める"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -181,9 +161,7 @@ class TestClassifierLoadLabel:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_load_imagenet_1000_labels(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_load_imagenet_1000_labels(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """ImageNet 1000クラスのラベルを読み込める"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -212,9 +190,7 @@ class TestClassifierPredict:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_predict_returns_probabilities(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_predict_returns_probabilities(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """推論結果が確率として返される"""
         # モックの設定
         mock_preprocess = Mock()
@@ -237,9 +213,7 @@ class TestClassifierPredict:
             # gRPCレスポンスをモック
             mock_response = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -259,9 +233,7 @@ class TestClassifierPredict:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_predict_probability_sum_to_one(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_predict_probability_sum_to_one(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """推論結果の確率の合計が1.0になる"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -281,9 +253,7 @@ class TestClassifierPredict:
 
             mock_response = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -323,9 +293,7 @@ class TestClassifierPredict:
 
             mock_response = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -363,9 +331,7 @@ class TestClassifierPredict:
 
             mock_response = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -385,9 +351,7 @@ class TestClassifierPredictLabel:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_predict_label_returns_string(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_predict_label_returns_string(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """ラベル推論結果が文字列として返される"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -408,9 +372,7 @@ class TestClassifierPredictLabel:
 
             mock_response = Mock()
             logits = np.array([[1.0, 5.0, 2.0]]).astype(np.float32)  # dogが最大
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -450,9 +412,7 @@ class TestClassifierPredictLabel:
 
             mock_response = Mock()
             logits = np.array([[1.0, 5.0, 2.0]]).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             classifier.stub = Mock()
             classifier.stub.Predict.return_value = mock_response
 
@@ -472,9 +432,7 @@ class TestClassifierGrpcCommunication:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_grpc_request_format(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_grpc_request_format(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """gRPCリクエストが正しいフォーマットで送信される"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -495,9 +453,7 @@ class TestClassifierGrpcCommunication:
             mock_stub = Mock()
             mock_response = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             mock_stub.Predict.return_value = mock_response
             classifier.stub = mock_stub
 
@@ -513,9 +469,7 @@ class TestClassifierGrpcCommunication:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_grpc_channel_creation(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_grpc_channel_creation(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """gRPCチャネルが正しいアドレスで作成される"""
         mock_preprocess = Mock()
         mock_softmax = Mock()
@@ -524,7 +478,7 @@ class TestClassifierGrpcCommunication:
         mock_open.return_value = mock_file
 
         with patch("json.load", return_value=["cat"]):
-            classifier = Classifier(
+            Classifier(
                 preprocess_transformer_path="/test/preprocess.pkl",
                 softmax_transformer_path="/test/softmax.pkl",
                 label_path="/test/labels.json",
@@ -541,9 +495,7 @@ class TestClassifierIntegration:
     @patch("src.ml.prediction.joblib.load")
     @patch("src.ml.prediction.grpc.insecure_channel")
     @patch("builtins.open")
-    def test_end_to_end_prediction_flow(
-        self, mock_open, mock_grpc_channel, mock_joblib_load
-    ):
+    def test_end_to_end_prediction_flow(self, mock_open, mock_grpc_channel, mock_joblib_load):
         """画像入力から確率出力までの一連のフローが動作する"""
         from src.ml.transformers import (
             PytorchImagePreprocessTransformer,
@@ -570,9 +522,7 @@ class TestClassifierIntegration:
             mock_stub = Mock()
             logits = np.random.randn(1, 1000).astype(np.float32)
             mock_response = Mock()
-            mock_response.outputs = {
-                "output": Mock(raw_data=logits.tobytes(), dtype=np.float32)
-            }
+            mock_response.outputs = {"output": Mock(raw_data=logits.tobytes(), dtype=np.float32)}
             mock_stub.Predict.return_value = mock_response
             classifier.stub = mock_stub
 

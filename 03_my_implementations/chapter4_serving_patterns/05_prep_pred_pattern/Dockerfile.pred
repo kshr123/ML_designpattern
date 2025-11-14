@@ -1,0 +1,122 @@
+# ================================================================================
+# Dockerfile.pred - 推論サービス（Pred Service）のDockerイメージ
+# ================================================================================
+#
+# 【このDockerfileの目的】
+#   - ONNX Runtime Serverを使った高速推論サービスの構築
+#   - ResNet50モデル（ImageNet学習済み）をONNX形式で配置
+#   - gRPCとHTTPの両方でアクセス可能な推論エンドポイントを提供
+#
+# 【マルチステージビルドを使う理由】
+#   - Stage 1: PyTorchのResNet50をONNX形式に変換して保存
+#   - Stage 2: ONNX Runtime Server + 変換済みモデルで軽量な推論サーバーを構築
+#   - 結果: 本番イメージにはPyTorchが不要（ONNX Runtimeのみ）
+#
+# 【全体の流れ】
+#   1. [Stage 1] PyTorchモデル → ONNX形式に変換
+#   2. [Stage 2] ONNX Runtime Server + 変換済みモデルで推論サーバー起動
+#
+# ================================================================================
+
+# ================================================================================
+# Stage 1: ONNXモデル抽出ステージ（builder）
+# ================================================================================
+#
+# 【目的】
+#   - PyTorchのResNet50（torchvisionから取得）をONNX形式に変換
+#   - 変換したモデルをonnxファイルに保存
+#
+# 【なぜこのステージが必要か】
+#   - PyTorch → ONNX変換には torch, torchvision が必要（重い依存）
+#   - 変換後のonnxファイルは約100MB
+#   - 本番環境ではONNX Runtimeのみで推論できる（PyTorch不要）
+#
+FROM python:3.11-slim as builder
+
+# ビルド引数: ResNet50関連ファイルのディレクトリ
+ARG SERVER_DIR=resnet50_onnx_runtime
+ENV PROJECT_DIR=prep_pred_pattern
+
+WORKDIR /${PROJECT_DIR}
+
+# requirements.txtを先にコピー（Dockerキャッシュ活用）
+ADD ./${SERVER_DIR}/requirements.txt /${PROJECT_DIR}/
+
+# ONNX抽出に必要なファイルをコピー
+# - extract_resnet50_onnx.py: PyTorchモデルをONNXに変換するスクリプト
+# - transformers.py: 前処理・後処理（--prepフラグ用、このステージでも必要）
+# - constants.py: モデル定義に必要な定数（画像サイズ等）
+# - cat.jpg: サンプル画像（変換時の動作確認用）
+# - image_net_labels.json: ImageNetラベル
+COPY ./${SERVER_DIR}/extract_resnet50_onnx.py /${PROJECT_DIR}/extract_resnet50_onnx.py
+COPY ./src/ml/transformers.py /${PROJECT_DIR}/src/ml/transformers.py
+COPY ./src/constants.py /${PROJECT_DIR}/src/constants.py
+COPY ./data/cat.jpg /${PROJECT_DIR}/data/cat.jpg
+COPY ./data/image_net_labels.json /${PROJECT_DIR}/data/image_net_labels.json
+
+# パッケージインストール & ONNX変換の実行
+RUN apt-get -y update && \
+    # ビルドツールのインストール
+    apt-get -y install apt-utils gcc && \
+    # キャッシュクリーンアップ
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    # Python依存関係をインストール（torch, torchvision, onnx等）
+    pip install --no-cache-dir -r requirements.txt && \
+    # Pythonモジュールとして認識させるため__init__.pyを作成
+    touch __init__.py && \
+    touch src/__init__.py && \
+    touch src/ml/__init__.py && \
+    # ONNX変換スクリプトを実行
+    # --pred: ResNet50をONNX形式で抽出
+    # --prep: 前処理・後処理Transformerも抽出（このイメージでは使わないが一緒に実行）
+    # → models/resnet50.onnx が生成される（約100MB）
+    python -m extract_resnet50_onnx --pred --prep
+
+# ================================================================================
+# Stage 2: ONNX Runtime Server（本番ランタイムイメージ）
+# ================================================================================
+#
+# 【目的】
+#   - ONNX Runtime Serverで高速推論を提供
+#   - gRPC（Port 50051）とHTTP（Port 8001）で推論エンドポイント公開
+#
+# 【ベースイメージ】
+#   - mcr.microsoft.com/onnxruntime/server:latest
+#   - MicrosoftのONNX Runtime公式イメージ
+#   - CPU最適化済み（AVX2等の最適化命令を使用）
+#
+FROM mcr.microsoft.com/onnxruntime/server:latest
+
+ARG SERVER_DIR=resnet50_onnx_runtime
+ENV PROJECT_DIR=prep_pred_pattern
+# モデルファイルの保存先ベースパス
+ENV MODEL_BASE_PATH=${PROJECT_DIR}/models
+
+WORKDIR /${PROJECT_DIR}
+
+# 【重要】Stage 1で変換したONNXモデルをコピー
+# --from=builder: Stage 1（builder）から取得
+# resnet50.onnx（約100MB）を本番イメージに配置
+COPY --from=builder /${MODEL_BASE_PATH}/resnet50.onnx /${MODEL_BASE_PATH}/resnet50.onnx
+
+# モデルファイルのパスを環境変数に設定
+# ONNX Runtime Serverの起動時にこのパスを参照
+ENV MODEL_PATH=/${MODEL_BASE_PATH}/resnet50.onnx
+
+# ================================================================================
+# ONNX Runtime Server起動スクリプトの準備
+# ================================================================================
+# ONNX Runtime Serverは /onnxruntime/server/ から起動する必要がある
+WORKDIR /onnxruntime/server/
+
+# 起動スクリプトをコピー
+# onnx_runtime_server_entrypoint.sh:
+#   - ONNX Runtime Serverを指定されたモデルで起動
+#   - HTTP（8001）とgRPC（50051）のポートを開く
+COPY ./${SERVER_DIR}/onnx_runtime_server_entrypoint.sh ./onnx_runtime_server_entrypoint.sh
+RUN chmod +x onnx_runtime_server_entrypoint.sh
+
+# コンテナ起動時に実行されるコマンド
+# onnx_runtime_server_entrypoint.sh → ONNX Runtime Server起動
+ENTRYPOINT ["./onnx_runtime_server_entrypoint.sh"]

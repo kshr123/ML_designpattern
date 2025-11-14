@@ -10,10 +10,10 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 11 / 26 パターン |
+| **完了パターン数** | 12 / 26 パターン |
 | **完了チュートリアル数** | 4 / 4 チュートリアル（すべて完了！） |
 | **現在の章** | Chapter 4: Serving Patterns（進行中） |
-| **最新の完了** | Batch Pattern (2025-11-13) |
+| **最新の完了** | Prep-Pred Pattern (2025-11-14) |
 | **次の目標** | Chapter 4: 他のServing Patternsへ進む |
 
 ---
@@ -49,11 +49,13 @@
   - 詳細: [03_my_implementations/chapter4_serving_patterns/03_asynchronous_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/03_asynchronous_pattern/README.md)
 - [x] **04_batch_pattern** (完了: 2025-11-13)
   - 詳細: [03_my_implementations/chapter4_serving_patterns/04_batch_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/04_batch_pattern/README.md)
+- [x] **05_prep_pred_pattern** (完了: 2025-11-14)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/05_prep_pred_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/05_prep_pred_pattern/README.md)
+  - 学習内容: gRPC通信、Protocol Buffers、ONNX Runtime Server、前処理・推論の分離
 - [ ] data_cache_pattern
 - [ ] edge_ai_pattern
 - [ ] horizontal_microservice_pattern
 - [ ] prediction_cache_pattern
-- [ ] prep_pred_pattern
 - [ ] sync_async_pattern
 
 ### Chapter 5: Operations（運用）

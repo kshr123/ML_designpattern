@@ -28,9 +28,7 @@ class APIConfigurations:
     """FastAPI設定クラス"""
 
     title = os.getenv("API_TITLE", "Prep-Pred Pattern")
-    description = os.getenv(
-        "API_DESCRIPTION", "前処理・推論分離パターン - ResNet50画像分類"
-    )
+    description = os.getenv("API_DESCRIPTION", "前処理・推論分離パターン - ResNet50画像分類")
     version = os.getenv("API_VERSION", "0.1.0")
 
 

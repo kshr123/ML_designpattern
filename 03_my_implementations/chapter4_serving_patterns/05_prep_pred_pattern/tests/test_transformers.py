@@ -1,7 +1,6 @@
 """前処理・後処理トランスフォーマーのテスト"""
 
 import numpy as np
-import pytest
 from PIL import Image
 
 from src.ml.transformers import PytorchImagePreprocessTransformer, SoftmaxTransformer
