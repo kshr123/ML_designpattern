@@ -32,11 +32,11 @@
 | 02 | **Synchronous Pattern** | TensorFlow Serving + gRPC/REST | ⭐⭐ | ✅ 完了 (2025-11-13) |
 | 03 | **Asynchronous Pattern** | 非同期推論パターン (Redis + ONNX) | ⭐⭐ | ✅ 完了 (2025-11-13) |
 | 04 | **Batch Pattern** | バッチ推論パターン (MySQL + ThreadPoolExecutor) | ⭐⭐ | ✅ 完了 (2025-11-13) |
-| 05 | Prep-Pred Pattern | 前処理・推論分離パターン | ⭐⭐ | ⏳ 未着手 |
-| 06 | Sync-Async Pattern | 同期・非同期ハイブリッド | ⭐⭐⭐ | ⏳ 未着手 |
-| 07 | Data Cache Pattern | データキャッシュパターン | ⭐⭐ | ⏳ 未着手 |
-| 08 | Prediction Cache Pattern | 推論結果キャッシュパターン | ⭐⭐ | ⏳ 未着手 |
-| 09 | Horizontal Microservice Pattern | 水平分割マイクロサービス | ⭐⭐⭐ | ⏳ 未着手 |
+| 05 | **Prep-Pred Pattern** | 前処理・推論分離パターン (ResNet50 + ONNX) | ⭐⭐ | ✅ 完了 (2025-11-13) |
+| 06 | **Horizontal Microservice Pattern** | 水平分割マイクロサービス (asyncio.gather) | ⭐⭐⭐ | ✅ 完了 (2025-11-14) |
+| 07 | **Sync-Async Pattern** | 同期・非同期ハイブリッド (ProcessPoolExecutor + BackgroundTasks) | ⭐⭐⭐ | ✅ 完了 (2025-11-14) |
+| 08 | Data Cache Pattern | データキャッシュパターン | ⭐⭐ | ⏳ 未着手 |
+| 09 | Prediction Cache Pattern | 推論結果キャッシュパターン | ⭐⭐ | ⏳ 未着手 |
 | 10 | Edge AI Pattern | エッジAIパターン | ⭐⭐⭐ | ⏳ 未着手 |
 
 ## 🎓 学習の推奨順序
@@ -73,9 +73,9 @@
 
 ## 📊 完了状況
 
-- **完了**: 4/10パターン (40%)
+- **完了**: 7/10パターン (70%)
 - **進行中**: 0/10パターン
-- **未着手**: 6/10パターン
+- **未着手**: 3/10パターン
 
 ### 完了パターン
 
@@ -125,6 +125,49 @@
   - Docker Composeで4サービス構成（mysql、mysql_test、api、job）
   - バッチジョブの自動再起動設定（restart: unless-stopped）
 - **詳細**: [04_batch_pattern/README.md](./04_batch_pattern/README.md)
+
+#### 05_prep_pred_pattern ✅
+- **完了日**: 2025-11-13
+- **技術スタック**: Python 3.13, FastAPI, ResNet50, ONNX Runtime, PIL, Docker
+- **成果**:
+  - 前処理サービスと推論サービスの分離アーキテクチャ
+  - ResNet50 (ImageNet) による画像分類
+  - TDDで3段階のテスト（Transformers → Prediction → Integration）
+  - ImageNet前処理の実装（リサイズ、正規化、チャンネル順序変換）
+  - ONNX Runtime最適化（InferenceSession設定）
+  - 包括的なドキュメント（README、SPECIFICATION、ソースコード概要）
+- **詳細**: [05_prep_pred_pattern/README.md](./05_prep_pred_pattern/README.md)
+
+#### 06_horizontal_microservice_pattern ✅
+- **完了日**: 2025-11-14
+- **技術スタック**: Python 3.13, FastAPI, httpx, asyncio, ONNX Runtime, Docker Compose
+- **成果**:
+  - 4サービス構成（Proxy + 3専門サービス）
+  - **asyncio.gather**による並行実行の実装 ⭐
+  - httpx.AsyncClientによる非同期HTTP通信 ⭐
+  - API Compositionパターンの実装
+  - 3つのバイナリ分類器（Setosa/Versicolor/Virginica）
+  - 最良ラベル選択アルゴリズム
+  - 並行実行と並列実行の違いを実践的に学習
+- **詳細**: [06_horizontal_microservice_pattern/README.md](./06_horizontal_microservice_pattern/README.md)
+
+#### 07_sync_async_pattern ✅
+- **完了日**: 2025-11-14
+- **技術スタック**: Python 3.13, FastAPI, Redis 7, ONNX Runtime, ProcessPoolExecutor, Docker Compose
+- **成果**:
+  - 同期推論（MobileNet v2）と非同期推論（ResNet50）のハイブリッド実装 ⭐
+  - **ProcessPoolExecutor**による真の並列実行（GILなし）⭐
+  - **FastAPI BackgroundTasks**でレスポンス後も処理継続 ⭐
+  - TDDで11テスト作成・全パス（実行時間2.76秒）
+  - FakeRedisによる外部依存なしテスト環境
+  - E2Eテストスクリプト作成（test_e2e.sh）
+  - プロセスvsスレッドの違いを実践的に学習
+  - 3サービス構成（Proxy + Worker + Redis）
+- **学んだ新技術**:
+  - ProcessPoolExecutor（真の並列実行）
+  - FastAPI BackgroundTasks（非同期タスク処理）
+  - asyncio.run_in_executor（asyncioとmultiprocessingの橋渡し）
+- **詳細**: [07_sync_async_pattern/README.md](./07_sync_async_pattern/README.md)
 
 ## 🔗 関連ドキュメント
 

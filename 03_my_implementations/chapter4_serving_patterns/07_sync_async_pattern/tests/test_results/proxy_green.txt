@@ -1,0 +1,70 @@
+# Proxy API テスト結果 (Green Phase)
+#
+# 目的: Proxy API実装後にすべてのテストがパスすることを確認
+# 日時: 2025-11-14
+#
+# 実装内容:
+# - src/proxy/app.py: FastAPI アプリケーション
+# - 同期推論: MobileNet v2（軽量・高速）
+# - 非同期ジョブ: BackgroundTasks でジョブをキューに登録
+# - Redis: ジョブデータの保存
+#
+# テスト内容:
+# 1. test_health_check - ヘルスチェックエンドポイント
+#    → /health が正常に応答するか確認
+#
+# 2. test_predict_endpoint - 推論エンドポイント（同期＋非同期ジョブ登録）
+#    → 同期推論結果が即座に返ってくるか確認
+#    → job_id が UUID 形式で返ってくるか確認
+#    → Redis にジョブが登録されているか確認
+#
+# 3. test_job_result_endpoint_pending - ジョブ結果取得（処理中）
+#    → status="pending" のジョブは空文字列を返すか確認
+#
+# 4. test_job_result_endpoint_completed - ジョブ結果取得（完了）
+#    → status="completed" のジョブは結果を返すか確認
+#
+# 5. test_job_result_endpoint_not_found - 存在しないジョブID
+#    → 404 エラーが返ってくるか確認
+#
+# テスト環境:
+# - FakeRedis を使用（外部依存なし）
+# - monkeypatch で redis_client を置き換え
+#
+# ========================================================================
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collected 5 items
+
+tests/test_proxy.py::test_health_check PASSED                            [ 20%]
+tests/test_proxy.py::test_predict_endpoint PASSED                        [ 40%]
+tests/test_proxy.py::test_job_result_endpoint_pending PASSED             [ 60%]
+tests/test_proxy.py::test_job_result_endpoint_completed PASSED           [ 80%]
+tests/test_proxy.py::test_job_result_endpoint_not_found PASSED           [100%]
+
+============================== 5 passed in 0.54s ===============================
+
+# ========================================================================
+# 結果: ✅ ALL PASSED
+#
+# 成功したテスト:
+# ✅ test_health_check - ヘルスチェック正常
+# ✅ test_predict_endpoint - 同期推論 + ジョブ登録成功
+# ✅ test_job_result_endpoint_pending - 処理中ジョブの取得成功
+# ✅ test_job_result_endpoint_completed - 完了ジョブの取得成功
+# ✅ test_job_result_endpoint_not_found - 404エラー正常
+#
+# 確認された機能:
+# - FastAPI エンドポイントが正常に動作
+# - MobileNet v2 による同期推論が即座に結果を返す
+# - BackgroundTasks でジョブがキューに登録される
+# - Redis へのジョブデータ保存が正常に動作
+# - ジョブステータスに応じた適切なレスポンス
+#
+# 次のステップ:
+# - Worker の実装とテスト
+# ========================================================================

@@ -1,0 +1,17 @@
+FROM python:3.13-slim
+
+WORKDIR /app
+
+# 依存関係インストール
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ソースコードとモデルコピー
+COPY src/ ./src/
+COPY models/ ./models/
+
+# PYTHONPATH設定
+ENV PYTHONPATH=/app
+
+# Worker起動
+CMD ["python", "-m", "src.worker.worker"]

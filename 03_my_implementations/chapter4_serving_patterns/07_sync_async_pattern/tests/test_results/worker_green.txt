@@ -1,0 +1,63 @@
+# Worker テスト結果 (Green Phase)
+#
+# 目的: Worker実装後にすべてのテストがパスすることを確認
+# 日時: 2025-11-14
+#
+# 実装内容:
+# - src/worker/worker.py: Redis キューからジョブを取得して処理
+# - ResNet50 による高精度推論
+# - 結果を Redis に保存
+# - エラーハンドリング
+#
+# テスト内容:
+# 1. test_process_job - ジョブ処理
+#    → Redis からジョブデータを取得
+#    → ResNet50 で推論実行
+#    → 結果を Redis に保存（status="completed"）
+#    → 推論結果が文字列で返ってくるか確認
+#
+# 2. test_process_job_not_found - 存在しないジョブの処理
+#    → 存在しないジョブIDを処理した場合
+#    → None が返ってくるか確認
+#
+# 3. test_process_job_invalid_data - 無効なデータの処理
+#    → 無効な Base64 データを処理した場合
+#    → エラーハンドリングが正常に動作するか確認
+#    → None が返ってくるか確認
+#
+# テスト環境:
+# - FakeRedis を使用（外部依存なし）
+#
+# ========================================================================
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collecting ... collected 3 items
+
+tests/test_worker.py::test_process_job PASSED                            [ 33%]
+tests/test_worker.py::test_process_job_not_found PASSED                  [ 66%]
+tests/test_worker.py::test_process_job_invalid_data PASSED               [100%]
+
+============================== 3 passed in 0.45s ===============================
+
+# ========================================================================
+# 結果: ✅ ALL PASSED
+#
+# 成功したテスト:
+# ✅ test_process_job - ジョブ処理成功
+# ✅ test_process_job_not_found - 存在しないジョブのハンドリング成功
+# ✅ test_process_job_invalid_data - 無効なデータのハンドリング成功
+#
+# 確認された機能:
+# - Redis からのジョブデータ取得が正常に動作
+# - ResNet50 による推論が正常に実行される
+# - 結果が Redis に正しく保存される（status="completed"）
+# - エラーハンドリングが適切に動作
+# - 存在しないジョブや無効なデータに対して None を返す
+#
+# 次のステップ:
+# - 統合テストの実行
+# ========================================================================

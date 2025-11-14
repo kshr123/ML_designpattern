@@ -1,0 +1,58 @@
+services:
+  # ==============================================================================
+  # Proxy Service: FastAPI + 同期推論（MobileNet v2）
+  # ==============================================================================
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    container_name: sync_async_proxy
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - SYNC_MODEL_PATH=models/mobilenet_v2.onnx
+      - QUEUE_NAME=queue:jobs
+    depends_on:
+      - redis
+    networks:
+      - sync_async_network
+    restart: always
+
+  # ==============================================================================
+  # Worker Service: ProcessPoolExecutor + 非同期推論（ResNet50）
+  # ==============================================================================
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: sync_async_worker
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - ASYNC_MODEL_PATH=models/resnet50.onnx
+      - NUM_WORKERS=2
+      - QUEUE_NAME=queue:jobs
+    depends_on:
+      - redis
+    networks:
+      - sync_async_network
+    restart: always
+
+  # ==============================================================================
+  # Redis: キュー + 結果ストア
+  # ==============================================================================
+  redis:
+    image: redis:7
+    container_name: sync_async_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - sync_async_network
+    restart: always
+
+networks:
+  sync_async_network:
+    driver: bridge

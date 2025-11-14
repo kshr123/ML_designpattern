@@ -238,7 +238,7 @@
 
 ---
 
-### 10. [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) ⭐ NEW!
+### 10. [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) ⭐
 **対象**: 画像分類モデルの選択に迷っている人、ResNetを使いたい人
 
 #### 📝 内容
@@ -269,6 +269,51 @@
 
 #### ⏱️ 読了時間
 約50分
+
+---
+
+### 11. [並行実行 vs 並列実行 完全ガイド](./11_concurrency_vs_parallelism.md) ⭐
+**対象**: 非同期処理・並列処理を理解したい人、asyncio.gatherの仕組みを知りたい人
+
+#### 📝 内容
+- 並行実行（Concurrency）と並列実行（Parallelism）の違い
+- asyncio.gatherの仕組みと使い方
+- multiprocessingとの違い
+- 適切な技術選択の方法
+- 実世界の例（レコメンデーションシステム、マルチモーダルAI）
+- Horizontal Microservice Patternでの実装解説
+
+#### 🎯 こんな時に読む
+- 「並行と並列って何が違うの？」
+- 「asyncio.gatherはなぜ速い？」
+- 「multiprocessingとasyncioどちらを使うべき？」
+- 「Horizontal Microservice Patternの仕組みを理解したい」
+- 「I/O待ちとCPU計算でどう使い分ける？」
+
+#### ⏱️ 読了時間
+約40分
+
+---
+
+### 12. [プロセス vs スレッド 完全ガイド](./12_process_vs_thread.md) ⭐ NEW!
+**対象**: プロセスとスレッドの違いを理解したい人、ThreadPoolExecutorとProcessPoolExecutorの使い分けを知りたい人
+
+#### 📝 内容
+- プロセスとスレッドの違い
+- ThreadPoolExecutor vs ProcessPoolExecutor
+- GIL（Global Interpreter Lock）の制約
+- 適切な使い分け方法
+- 実践例（画像処理、APIリクエスト、機械学習推論）
+
+#### 🎯 こんな時に読む
+- 「プロセスとスレッドって何が違うの？」
+- 「ThreadPoolExecutorとProcessPoolExecutorどちらを使うべき？」
+- 「GILって何？」
+- 「並列処理で速くならないのはなぜ？」
+- 「Sync-Async Patternの技術を理解したい」
+
+#### ⏱️ 読了時間
+約25分
 
 ---
 
@@ -304,10 +349,16 @@
 9. PyTorch画像分類 完全ガイド
    ↓ (深層学習)
 
-10. ResNetとCNNモデル使い分けガイド ⭐ NEW!
+10. ResNetとCNNモデル使い分けガイド ⭐
    ↓ (モデル選択・画像分類)
 
-11. 実際のプロジェクトに適用
+11. 並行実行 vs 並列実行 完全ガイド ⭐
+   ↓ (非同期・並列処理)
+
+12. プロセス vs スレッド 完全ガイド ⭐ NEW!
+   ↓ (プロセス・スレッド並列)
+
+13. 実際のプロジェクトに適用
 ```
 
 ### シナリオ別ガイド
@@ -351,6 +402,12 @@
 | どのCNNモデルを選べばいい？ | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
 | ImageNet正規化がわからない | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
 | モデルの使い分けを知りたい | [ResNetとCNNモデル使い分けガイド](./10_resnet_and_cnn_models_guide.md) |
+| 並行と並列って何が違うの？ | [並行実行 vs 並列実行 完全ガイド](./11_concurrency_vs_parallelism.md) |
+| asyncio.gatherはなぜ速い？ | [並行実行 vs 並列実行 完全ガイド](./11_concurrency_vs_parallelism.md) |
+| multiprocessingとasyncioの違いは？ | [並行実行 vs 並列実行 完全ガイド](./11_concurrency_vs_parallelism.md) |
+| プロセスとスレッドの違いは？ | [プロセス vs スレッド 完全ガイド](./12_process_vs_thread.md) |
+| ThreadPoolExecutorとProcessPoolExecutorどちらを使う？ | [プロセス vs スレッド 完全ガイド](./12_process_vs_thread.md) |
+| GILって何？ | [プロセス vs スレッド 完全ガイド](./12_process_vs_thread.md) |
 
 ---
 
@@ -368,6 +425,8 @@
 | **PyTorch画像分類 完全ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約1100行 |
 | **Docker & Kubernetes 入門ガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約850行 |
 | **ResNetとCNNモデル使い分けガイド** ⭐ | 初級〜中級 | ⭐⭐⭐ | 約800行 |
+| **並行実行 vs 並列実行 完全ガイド** ⭐ | 中級 | ⭐⭐⭐ | 約650行 |
+| **プロセス vs スレッド 完全ガイド** ⭐ | 中級 | ⭐⭐⭐ | 約550行 |
 
 ---
 
@@ -415,8 +474,11 @@
 - 学習を通じて得た知見を追加
 
 ### 更新履歴
+- **2025-11-14**:
+  - プロセス vs スレッド 完全ガイドを追加 ⭐ NEW!
+  - 並行実行 vs 並列実行 完全ガイドを追加 ⭐
 - **2025-11-13**:
-  - ResNetとCNNモデル使い分けガイドを追加 ⭐ NEW!
+  - ResNetとCNNモデル使い分けガイドを追加 ⭐
 - **2025-11-06**:
   - Docker & Kubernetes 入門ガイドを追加 ⭐
 - **2025-11-05**:
@@ -459,7 +521,9 @@
 ├── 07_one_class_svm_and_anomaly_detection.md    # One-Class SVMと外れ値検出手法
 ├── 08_pytorch_image_classification_guide.md     # PyTorch画像分類 完全ガイド ⭐
 ├── 09_docker_kubernetes_basics.md               # Docker & Kubernetes 入門ガイド ⭐
-└── 10_resnet_and_cnn_models_guide.md            # ResNetとCNNモデル使い分けガイド ⭐
+├── 10_resnet_and_cnn_models_guide.md            # ResNetとCNNモデル使い分けガイド ⭐
+├── 11_concurrency_vs_parallelism.md             # 並行実行 vs 並列実行 完全ガイド ⭐
+└── 12_process_vs_thread.md                      # プロセス vs スレッド 完全ガイド ⭐
 ```
 
 ---

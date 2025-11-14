@@ -1,0 +1,126 @@
+# 全テスト結果 (統合テスト)
+#
+# 目的: Sync-Async Pattern の全コンポーネントが正常に動作することを確認
+# 日時: 2025-11-14
+#
+# テスト対象コンポーネント:
+# 1. Predictor (src/ml/predictor.py) - ONNX Runtime 推論
+# 2. Proxy API (src/proxy/app.py) - 同期推論 + 非同期ジョブ登録
+# 3. Worker (src/worker/worker.py) - 非同期推論処理
+#
+# ========================================================================
+# テスト詳細
+# ========================================================================
+#
+# [Predictor テスト] (3 tests)
+# --------------------------------
+# ✅ test_predictor_initialization
+#    - ONNX Runtime セッションが正常に初期化されるか
+#    - 入出力名が正しく取得されるか
+#
+# ✅ test_predict_from_base64
+#    - Base64 エンコードされた画像から推論できるか
+#    - 結果が文字列（ラベル名）で返ってくるか
+#
+# ✅ test_preprocess
+#    - 画像の前処理が正しく実行されるか
+#    - 出力形状が (1, 3, 224, 224) であるか
+#
+# [Proxy API テスト] (5 tests)
+# --------------------------------
+# ✅ test_health_check
+#    - /health エンドポイントが正常に応答するか
+#
+# ✅ test_predict_endpoint
+#    - 同期推論（MobileNet v2）が即座に結果を返すか
+#    - job_id が UUID 形式で返ってくるか
+#    - Redis にジョブが正しく登録されるか
+#
+# ✅ test_job_result_endpoint_pending
+#    - 処理中（status="pending"）のジョブは空文字列を返すか
+#
+# ✅ test_job_result_endpoint_completed
+#    - 完了（status="completed"）のジョブは結果を返すか
+#
+# ✅ test_job_result_endpoint_not_found
+#    - 存在しないジョブIDで 404 エラーが返るか
+#
+# [Worker テスト] (3 tests)
+# --------------------------------
+# ✅ test_process_job
+#    - Redis からジョブを取得して ResNet50 で推論できるか
+#    - 結果が Redis に正しく保存されるか（status="completed"）
+#
+# ✅ test_process_job_not_found
+#    - 存在しないジョブに対して None を返すか
+#
+# ✅ test_process_job_invalid_data
+#    - 無効なデータに対してエラーハンドリングが動作するか
+#
+# ========================================================================
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collecting ... collected 11 items
+
+tests/test_predictor.py::test_predictor_initialization PASSED            [  9%]
+tests/test_predictor.py::test_predict_from_base64 PASSED                 [ 18%]
+tests/test_predictor.py::test_preprocess PASSED                          [ 27%]
+tests/test_proxy.py::test_health_check PASSED                            [ 36%]
+tests/test_proxy.py::test_predict_endpoint PASSED                        [ 45%]
+tests/test_proxy.py::test_job_result_endpoint_pending PASSED             [ 54%]
+tests/test_proxy.py::test_job_result_endpoint_completed PASSED           [ 63%]
+tests/test_proxy.py::test_job_result_endpoint_not_found PASSED           [ 72%]
+tests/test_worker.py::test_process_job PASSED                            [ 81%]
+tests/test_worker.py::test_process_job_not_found PASSED                  [ 90%]
+tests/test_worker.py::test_process_job_invalid_data PASSED               [100%]
+
+============================== 11 passed in 2.76s ==============================
+
+# ========================================================================
+# 最終結果: ✅ ALL PASSED (11/11)
+# ========================================================================
+#
+# 実行時間: 2.76秒
+#
+# コンポーネント別結果:
+# ✅ Predictor:  3/3 passed
+# ✅ Proxy API:  5/5 passed
+# ✅ Worker:     3/3 passed
+#
+# 確認された主要機能:
+# --------------------------------------------------
+# 【同期推論（Sync）】
+# - MobileNet v2 による軽量・高速推論
+# - レスポンスタイムを最小化（即座に結果を返す）
+# - FastAPI による REST API 提供
+#
+# 【非同期推論（Async）】
+# - ResNet50 による高精度推論（バックグラウンド処理）
+# - Redis キューによるジョブ管理
+# - Worker による非同期処理
+# - BackgroundTasks によるレスポンス後の処理
+#
+# 【共通機能】
+# - ONNX Runtime による高速推論
+# - ImageNet 標準の前処理
+# - Base64 エンコード画像のサポート
+# - エラーハンドリング
+# - FakeRedis によるテスト（外部依存なし）
+#
+# TDD サイクル完了:
+# --------------------------------------------------
+# 1. ✅ Predictor: Red → Green
+# 2. ✅ Proxy:     Red → Green
+# 3. ✅ Worker:    Red → Green
+# 4. ✅ 統合:      All Green
+#
+# 次のステップ:
+# --------------------------------------------------
+# - Docker Compose での E2E テスト
+# - 負荷テスト（同期/非同期のパフォーマンス比較）
+# - ドキュメント作成
+# ========================================================================

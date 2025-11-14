@@ -1,0 +1,46 @@
+# Worker テスト結果 (Red Phase)
+#
+# 目的: Worker実装前にテストを作成し、失敗することを確認
+# 日時: 2025-11-14
+#
+# テスト内容:
+# 1. test_process_job - ジョブ処理
+# 2. test_process_job_not_found - 存在しないジョブの処理
+# 3. test_process_job_invalid_data - 無効なデータの処理
+#
+# 期待される結果: src.worker.worker モジュールが存在しないためインポートエラー
+#
+# ========================================================================
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+____________________ ERROR collecting tests/test_worker.py _____________________
+ImportError while importing test module '/Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/tests/test_worker.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_worker.py:11: in <module>
+    from src.worker.worker import process_job
+E   ModuleNotFoundError: No module named 'src.worker.worker'
+
+# ========================================================================
+# 結果: ❌ FAILED (expected)
+#
+# エラー内容:
+# - src.worker.worker モジュールが存在しないためインポートエラー
+# - これは期待通りの動作（Red Phase）
+#
+# 次のステップ:
+# - src/worker/worker.py を実装してテストをパスさせる（Green Phase）
+# ========================================================================
+=========================== short test summary info ============================
+ERROR tests/test_worker.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.14s ===============================

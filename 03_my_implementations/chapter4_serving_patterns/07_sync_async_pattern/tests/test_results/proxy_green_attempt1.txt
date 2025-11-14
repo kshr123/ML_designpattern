@@ -1,0 +1,838 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collecting ... collected 5 items
+
+tests/test_proxy.py::test_health_check PASSED                            [ 20%]
+tests/test_proxy.py::test_predict_endpoint FAILED                        [ 40%]
+tests/test_proxy.py::test_predict_endpoint ERROR                         [ 40%]
+tests/test_proxy.py::test_job_result_endpoint_pending FAILED             [ 60%]
+tests/test_proxy.py::test_job_result_endpoint_pending ERROR              [ 60%]
+tests/test_proxy.py::test_job_result_endpoint_completed FAILED           [ 80%]
+tests/test_proxy.py::test_job_result_endpoint_completed ERROR            [ 80%]
+tests/test_proxy.py::test_job_result_endpoint_not_found FAILED           [100%]
+
+==================================== ERRORS ====================================
+__________________ ERROR at teardown of test_predict_endpoint __________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def redis_client():
+        """Redisクライアント"""
+        client = Redis(host=AppConfig.REDIS_HOST, port=AppConfig.REDIS_PORT, decode_responses=True)
+        yield client
+        # テスト後クリーンアップ
+>       client.flushdb()
+
+tests/test_proxy.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/commands/core.py:941: in flushdb
+    return self.execute_command("FLUSHDB", *args, **kwargs)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+____________ ERROR at teardown of test_job_result_endpoint_pending _____________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def redis_client():
+        """Redisクライアント"""
+        client = Redis(host=AppConfig.REDIS_HOST, port=AppConfig.REDIS_PORT, decode_responses=True)
+        yield client
+        # テスト後クリーンアップ
+>       client.flushdb()
+
+tests/test_proxy.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/commands/core.py:941: in flushdb
+    return self.execute_command("FLUSHDB", *args, **kwargs)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+___________ ERROR at teardown of test_job_result_endpoint_completed ____________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+    @pytest.fixture
+    def redis_client():
+        """Redisクライアント"""
+        client = Redis(host=AppConfig.REDIS_HOST, port=AppConfig.REDIS_PORT, decode_responses=True)
+        yield client
+        # テスト後クリーンアップ
+>       client.flushdb()
+
+tests/test_proxy.py:37: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/commands/core.py:941: in flushdb
+    return self.execute_command("FLUSHDB", *args, **kwargs)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+=================================== FAILURES ===================================
+____________________________ test_predict_endpoint _____________________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+client = <starlette.testclient.TestClient object at 0x111b8afd0>
+test_image_base64 = 'iVBORw0KGgoAAAANSUhEUgAAAOAAAADgCAIAAACVT/22AAACaklEQVR4nO3SMQEAIAzAMED5pOOAlx6Jgh7dM7Og6vwOgBeDkmZQ0gxKmkFJMyhpBiXNo...hpBiXNoKQZlDSDkmZQ0gxKmkFJMyhpBiXNoKQZlDSDkmZQ0gxKmkFJMyhpBiXNoKQZlDSDkmZQ0gxKmkFJMyhpBiXtAi/3A0Ab3DaFAAAAAElFTkSuQmCC'
+redis_client = <redis.client.Redis(<redis.connection.ConnectionPool(<redis.connection.Connection(host=localhost,port=6379,db=0)>)>)>
+
+    def test_predict_endpoint(client, test_image_base64, redis_client):
+        """推論エンドポイントのテスト"""
+        # リクエスト
+>       response = client.post(
+            "/predict",
+            json={"image_data": test_image_base64}
+        )
+
+tests/test_proxy.py:50: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/starlette/testclient.py:593: in post
+    return super().post(
+.venv/lib/python3.13/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.13/site-packages/starlette/testclient.py:484: in request
+    return super().request(
+.venv/lib/python3.13/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.13/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.13/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.13/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.13/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.13/site-packages/starlette/testclient.py:377: in handle_request
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/testclient.py:374: in handle_request
+    portal.call(self.app, scope, receive, send)
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:321: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:252: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.13/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:74: in app
+    await response(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/responses.py:158: in __call__
+    await self.background()
+.venv/lib/python3.13/site-packages/starlette/background.py:41: in __call__
+    await task()
+.venv/lib/python3.13/site-packages/starlette/background.py:28: in __call__
+    await run_in_threadpool(self.func, *self.args, **self.kwargs)
+.venv/lib/python3.13/site-packages/starlette/concurrency.py:39: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func, *args)
+.venv/lib/python3.13/site-packages/anyio/to_thread.py:56: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:2485: in run_sync_in_worker_thread
+    return await future
+.venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py:976: in run
+    result = context.run(func, *args)
+src/proxy/app.py:45: in enqueue_job
+    redis_client.setex(
+.venv/lib/python3.13/site-packages/redis/commands/core.py:2360: in setex
+    return self.execute_command("SETEX", name, time, value)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+_______________________ test_job_result_endpoint_pending _______________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+client = <starlette.testclient.TestClient object at 0x11411b110>
+redis_client = <redis.client.Redis(<redis.connection.ConnectionPool(<redis.connection.Connection(host=localhost,port=6379,db=0)>)>)>
+
+    def test_job_result_endpoint_pending(client, redis_client):
+        """ジョブ結果取得（処理中）のテスト"""
+        # テスト用ジョブを登録
+        job_id = "test-job-id-12345"
+>       redis_client.setex(
+            f"job:{job_id}",
+            AppConfig.RESULT_TTL,
+            json.dumps({"status": "pending", "image_data": "dummy"})
+        )
+
+tests/test_proxy.py:83: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/commands/core.py:2360: in setex
+    return self.execute_command("SETEX", name, time, value)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+______________________ test_job_result_endpoint_completed ______________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+client = <starlette.testclient.TestClient object at 0x1116fd5b0>
+redis_client = <redis.client.Redis(<redis.connection.ConnectionPool(<redis.connection.Connection(host=localhost,port=6379,db=0)>)>)>
+
+    def test_job_result_endpoint_completed(client, redis_client):
+        """ジョブ結果取得（完了）のテスト"""
+        # テスト用ジョブを登録（完了状態）
+        job_id = "test-job-id-67890"
+>       redis_client.setex(
+            f"job:{job_id}",
+            AppConfig.RESULT_TTL,
+            json.dumps({"status": "completed", "result": "tabby cat"})
+        )
+
+tests/test_proxy.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/commands/core.py:2360: in setex
+    return self.execute_command("SETEX", name, time, value)
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+______________________ test_job_result_endpoint_not_found ______________________
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+>           sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+
+.venv/lib/python3.13/site-packages/redis/connection.py:357: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/redis/retry.py:62: in call_with_retry
+    return do()
+.venv/lib/python3.13/site-packages/redis/connection.py:358: in <lambda>
+    lambda: self._connect(), lambda error: self.disconnect(error)
+.venv/lib/python3.13/site-packages/redis/connection.py:730: in _connect
+    raise err
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def _connect(self):
+        "Create a TCP socket connection"
+        # we want to mimic what socket.create_connection does to support
+        # ipv4/ipv6, but we want to set options prior to calling
+        # socket.connect()
+        err = None
+        for res in socket.getaddrinfo(
+            self.host, self.port, self.socket_type, socket.SOCK_STREAM
+        ):
+            family, socktype, proto, canonname, socket_address = res
+            sock = None
+            try:
+                sock = socket.socket(family, socktype, proto)
+                # TCP_NODELAY
+                sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
+    
+                # TCP_KEEPALIVE
+                if self.socket_keepalive:
+                    sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                    for k, v in self.socket_keepalive_options.items():
+                        sock.setsockopt(socket.IPPROTO_TCP, k, v)
+    
+                # set the socket_connect_timeout before we connect
+                sock.settimeout(self.socket_connect_timeout)
+    
+                # connect
+>               sock.connect(socket_address)
+E               ConnectionRefusedError: [Errno 61] Connection refused
+
+.venv/lib/python3.13/site-packages/redis/connection.py:718: ConnectionRefusedError
+
+During handling of the above exception, another exception occurred:
+
+client = <starlette.testclient.TestClient object at 0x1143e5ba0>
+
+    def test_job_result_endpoint_not_found(client):
+        """存在しないジョブIDのテスト"""
+>       response = client.get("/job/non-existent-job-id")
+
+tests/test_proxy.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.13/site-packages/starlette/testclient.py:514: in get
+    return super().get(
+.venv/lib/python3.13/site-packages/httpx/_client.py:1053: in get
+    return self.request(
+.venv/lib/python3.13/site-packages/starlette/testclient.py:484: in request
+    return super().request(
+.venv/lib/python3.13/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.13/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.13/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.13/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.13/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.13/site-packages/starlette/testclient.py:377: in handle_request
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/testclient.py:374: in handle_request
+    portal.call(self.app, scope, receive, send)
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:321: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/concurrent/futures/_base.py:456: in result
+    return self.__get_result()
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+.venv/lib/python3.13/site-packages/anyio/from_thread.py:252: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.13/site-packages/fastapi/applications.py:1054: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/applications.py:113: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:187: in __call__
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/middleware/errors.py:165: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.13/site-packages/starlette/middleware/exceptions.py:62: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:715: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:735: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:288: in handle
+    await self.app(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/routing.py:76: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.13/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.13/site-packages/starlette/routing.py:73: in app
+    response = await f(request)
+.venv/lib/python3.13/site-packages/fastapi/routing.py:301: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.13/site-packages/fastapi/routing.py:212: in run_endpoint_function
+    return await dependant.call(**values)
+src/proxy/app.py:107: in get_job_result
+    job_data_str = redis_client.get(f"job:{job_id}")
+.venv/lib/python3.13/site-packages/redis/commands/core.py:1822: in get
+    return self.execute_command("GET", name, keys=[name])
+.venv/lib/python3.13/site-packages/redis/client.py:559: in execute_command
+    return self._execute_command(*args, **options)
+.venv/lib/python3.13/site-packages/redis/client.py:565: in _execute_command
+    conn = self.connection or pool.get_connection(command_name, **options)
+.venv/lib/python3.13/site-packages/redis/connection.py:1422: in get_connection
+    connection.connect()
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <redis.connection.Connection(host=localhost,port=6379,db=0)>
+
+    def connect(self):
+        "Connects to the Redis server if not already connected"
+        if self._sock:
+            return
+        try:
+            sock = self.retry.call_with_retry(
+                lambda: self._connect(), lambda error: self.disconnect(error)
+            )
+        except socket.timeout:
+            raise TimeoutError("Timeout connecting to server")
+        except OSError as e:
+>           raise ConnectionError(self._error_message(e))
+E           redis.exceptions.ConnectionError: Error 61 connecting to localhost:6379. Connection refused.
+
+.venv/lib/python3.13/site-packages/redis/connection.py:363: ConnectionError
+=========================== short test summary info ============================
+FAILED tests/test_proxy.py::test_predict_endpoint - redis.exceptions.Connecti...
+FAILED tests/test_proxy.py::test_job_result_endpoint_pending - redis.exceptio...
+FAILED tests/test_proxy.py::test_job_result_endpoint_completed - redis.except...
+FAILED tests/test_proxy.py::test_job_result_endpoint_not_found - redis.except...
+ERROR tests/test_proxy.py::test_predict_endpoint - redis.exceptions.Connectio...
+ERROR tests/test_proxy.py::test_job_result_endpoint_pending - redis.exception...
+ERROR tests/test_proxy.py::test_job_result_endpoint_completed - redis.excepti...
+==================== 4 failed, 1 passed, 3 errors in 1.22s =====================

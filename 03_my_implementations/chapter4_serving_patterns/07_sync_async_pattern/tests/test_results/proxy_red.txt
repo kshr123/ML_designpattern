@@ -1,0 +1,48 @@
+# Proxy API テスト結果 (Red Phase)
+#
+# 目的: Proxy APIの実装前にテストを作成し、失敗することを確認
+# 日時: 2025-11-14
+#
+# テスト内容:
+# 1. test_health_check - ヘルスチェックエンドポイント
+# 2. test_predict_endpoint - 推論エンドポイント（同期＋非同期ジョブ登録）
+# 3. test_job_result_endpoint_pending - ジョブ結果取得（処理中）
+# 4. test_job_result_endpoint_completed - ジョブ結果取得（完了）
+# 5. test_job_result_endpoint_not_found - 存在しないジョブID
+#
+# 期待される結果: src.proxy.app モジュールが存在しないためインポートエラー
+#
+# ========================================================================
+
+============================= test session starts ==============================
+platform darwin -- Python 3.13.9, pytest-8.3.4, pluggy-1.6.0 -- /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/.venv/bin/python3
+cachedir: .pytest_cache
+rootdir: /Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern
+plugins: cov-6.0.0, anyio-4.11.0
+collecting ... collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+_____________________ ERROR collecting tests/test_proxy.py _____________________
+ImportError while importing test module '/Users/kotaro/Desktop/dev/ML_designpattern/03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/tests/test_proxy.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/Users/kotaro/.local/share/uv/python/cpython-3.13.9-macos-aarch64-none/lib/python3.13/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+tests/test_proxy.py:11: in <module>
+    from src.proxy.app import app
+E   ModuleNotFoundError: No module named 'src.proxy.app'
+
+# ========================================================================
+# 結果: ❌ FAILED (expected)
+#
+# エラー内容:
+# - src.proxy.app モジュールが存在しないためインポートエラー
+# - これは期待通りの動作（Red Phase）
+#
+# 次のステップ:
+# - src/proxy/app.py を実装してテストをパスさせる（Green Phase）
+# ========================================================================
+=========================== short test summary info ============================
+ERROR tests/test_proxy.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.30s ===============================

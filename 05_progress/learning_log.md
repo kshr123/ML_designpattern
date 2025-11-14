@@ -10,11 +10,11 @@
 | 項目 | 内容 |
 |------|------|
 | **開始日** | 2025-11-03 |
-| **完了パターン数** | 13 / 26 パターン |
+| **完了パターン数** | 14 / 26 パターン |
 | **完了チュートリアル数** | 4 / 4 チュートリアル（すべて完了！） |
 | **現在の章** | Chapter 4: Serving Patterns（進行中） |
-| **最新の完了** | Horizontal Microservice Pattern (2025-11-14) |
-| **次の目標** | Chapter 4: 他のServing Patternsへ進む |
+| **最新の完了** | Sync-Async Pattern (2025-11-14) |
+| **次の目標** | Chapter 4: 残り3パターン（Data Cache, Prediction Cache, Edge AI） |
 
 ---
 
@@ -55,10 +55,12 @@
 - [x] **06_horizontal_microservice_pattern** (完了: 2025-11-14)
   - 詳細: [03_my_implementations/chapter4_serving_patterns/06_horizontal_microservice_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/06_horizontal_microservice_pattern/README.md)
   - 学習内容: asyncio.gather並列実行、httpx.AsyncClient、専門化されたマイクロサービス、API Compositionパターン
+- [x] **07_sync_async_pattern** (完了: 2025-11-14)
+  - 詳細: [03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/README.md](../03_my_implementations/chapter4_serving_patterns/07_sync_async_pattern/README.md)
+  - 学習内容: ProcessPoolExecutor（真の並列実行）、FastAPI BackgroundTasks、同期・非同期ハイブリッド推論、プロセスvsスレッド
 - [ ] data_cache_pattern
 - [ ] edge_ai_pattern
 - [ ] prediction_cache_pattern
-- [ ] sync_async_pattern
 
 ### Chapter 5: Operations（運用）
 - [ ] prediction_log_pattern
